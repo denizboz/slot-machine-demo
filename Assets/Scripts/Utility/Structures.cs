@@ -10,7 +10,12 @@ namespace Utility
         Wild = 40,
         Jackpot = 50
     }
-        
+
+    public enum WheelLocation
+    {
+        Left, Middle, Right
+    }
+    
     [Serializable]
     public struct Lineup
     {

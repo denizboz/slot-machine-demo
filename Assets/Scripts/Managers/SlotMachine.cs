@@ -21,6 +21,9 @@ namespace Managers
 
         protected override void OnAwake()
         {
+            return;
+            
+            
             if (!PlayerPrefs.HasKey(keyForCurrentRound))
                 PlayerPrefs.SetInt(keyForCurrentRound, 0);
 

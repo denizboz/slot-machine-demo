@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CommonTools.Runtime.Events
+namespace Events
 {
     public abstract class Event
     {
