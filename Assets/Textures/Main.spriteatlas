@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Main
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 1
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 102900000, guid: 442beba77b0febe4a95e6d4543618daf, type: 3}
+    - {fileID: 102900000, guid: 5f20883f727eaee40aa9fbbffc1b3374, type: 3}
+    - {fileID: 102900000, guid: 53292f8eada40d944975872bcb75b1d2, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: a9d70c6226bfc9f4fb09bc7633d050e4, type: 3}
+  - {fileID: 21300000, guid: 9b6fd8d2d48a7a34d87c1779c59d5dfe, type: 3}
+  - {fileID: 21300000, guid: 9708ab43d2e99cc4cb40bcc6b84b58e5, type: 3}
+  - {fileID: 21300000, guid: b5a3e134d3550184b84ea03e6afda1e3, type: 3}
+  - {fileID: 21300000, guid: cf63edd558d83204283798d9a325a6e6, type: 3}
+  - {fileID: 21300000, guid: 7650aca72b2934d4c835e349453a6e10, type: 3}
+  - {fileID: 21300000, guid: b427ac0a051745248818b6b77d71d9fa, type: 3}
+  - {fileID: 21300000, guid: 2657248a222332d4e8f9244fefe02816, type: 3}
+  - {fileID: 21300000, guid: c5044f4cbbbe55e488b2f7cbe47e6c9b, type: 3}
+  - {fileID: 21300000, guid: cae0c79daffc59445b87d9ada9f0b462, type: 3}
+  - {fileID: 21300000, guid: bc7e30ad83590cc45a37d51b1459d154, type: 3}
+  - {fileID: 21300000, guid: fec0945e50315ef4392b2cd4c2707c10, type: 3}
+  - {fileID: 21300000, guid: 15d06b4fad432804dae3644dd10fdbb4, type: 3}
+  - {fileID: 21300000, guid: 4b7ecbaff03a02449bcaf2d37ca16f23, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Slot_back
+  - Wild_00_blur
+  - Slot_gradient
+  - coins
+  - A_00
+  - Bonus_00
+  - A_00_blur
+  - Wild_00
+  - Seven_00_blur
+  - Seven_00
+  - Bonus_00_blur
+  - Jackpot_00_blur
+  - slot_window
+  - Jackpot_00
+  m_RenderDataMap: {}
+  m_Tag: Main
+  m_IsVariant: 0
