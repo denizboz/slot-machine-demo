@@ -1,4 +1,5 @@
 ﻿using CommonTools.Runtime.DependencyInjection;
+using DG.Tweening;
 using Events;
 using Events.Implementations.Slots;
 using Managers;
@@ -33,15 +34,6 @@ namespace Slots
             GameEventSystem.AddListener<SymbolDisappearedEvent>(OnSymbolDisappeared);
         }
 
-        private void Update()
-        {
-            // debug purposes
-            if (Input.GetKey(KeyCode.Return))
-            {
-                m_spinner.anchoredPosition += 5000f * Time.deltaTime * Vector2.down;
-            }
-        }
-
         private void Start()
         {
             m_symbolFactory = DI.Resolve<SymbolFactory>();
@@ -50,6 +42,12 @@ namespace Slots
             SetBottomY();
         }
 
+        public void Spin(float time, float speed)
+        {
+            var distance = time * speed;
+            m_spinner.DOAnchorPos(distance * Vector2.down, time);
+        }
+        
         private void OnSymbolDisappeared(object location)
         {
             if ((WheelLocation)location == m_location)

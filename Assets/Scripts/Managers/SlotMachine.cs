@@ -1,4 +1,6 @@
 ﻿using CommonTools.Runtime.DependencyInjection;
+using CommonTools.Runtime.TaskManagement;
+using Slots;
 using UnityEngine;
 using Utility;
 
@@ -35,6 +37,25 @@ namespace Managers
             if (m_currentRound == 0)
             {
                 var newDistribution = CreateNewDistribution();
+            }
+        }
+
+        public void Spin()
+        {
+            var wheels = GetComponentsInChildren<Wheel>();
+
+            var delays = new float[wheels.Length];
+            
+            for (var i = 0; i < delays.Length; i++)
+            {
+                var delay = Random.Range(0.2f, 0.5f);
+                delays[i] = i == 0 ? delay : delays[i - 1] + delay;
+            }
+            
+            for (var i = 0; i < wheels.Length; i++)
+            {
+                var wheel = wheels[i];
+                GameTask.Wait(delays[i]).Do((() => wheel.Spin(1f, 10000f)));
             }
         }
 
