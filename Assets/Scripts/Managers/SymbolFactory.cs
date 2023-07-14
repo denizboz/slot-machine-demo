@@ -15,7 +15,7 @@ namespace Managers
         
         private Queue<Symbol> m_symbolPool;
 
-        private const int poolSize = 32;
+        private const int poolSize = 128;
 
         protected override void Bind()
         {

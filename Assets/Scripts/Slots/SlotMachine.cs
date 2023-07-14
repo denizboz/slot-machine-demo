@@ -1,12 +1,11 @@
 ﻿using CommonTools.Runtime.DependencyInjection;
 using CommonTools.Runtime.TaskManagement;
-using Slots;
 using UnityEngine;
 using Utility;
 
-namespace Managers
+namespace Slots
 {
-    public class SlotMachine : Manager
+    public class SlotMachine : MonoBehaviour
     {
         [SerializeField] private ProbDistributionSO m_probDistribution;
         // prob dist can also be loaded by Resources.Load(), depending on preference.
@@ -16,16 +15,13 @@ namespace Managers
 
         private const string keyForCurrentRound = "current_round";
         
-        protected override void Bind()
+        
+        protected void Awake()
         {
             DI.Bind<SlotMachine>(this);
-        }
-
-        protected override void OnAwake()
-        {
+            
             return;
-            
-            
+
             if (!PlayerPrefs.HasKey(keyForCurrentRound))
                 PlayerPrefs.SetInt(keyForCurrentRound, 0);
 
@@ -54,8 +50,10 @@ namespace Managers
             
             for (var i = 0; i < wheels.Length; i++)
             {
-                var wheel = wheels[i];
-                GameTask.Wait(delays[i]).Do((() => wheel.Spin(1f, 10000f)));
+                // var wheel = wheels[i];
+                // GameTask.Wait(delays[i]).Do((() => wheel.Spin(2.5f, 5000f)));
+                
+                wheels[i].Spin(2.5f, 5000f);
             }
         }
 
@@ -65,14 +63,6 @@ namespace Managers
             var generator = new DistributionGenerator<Lineup>(lineupOccurrences);
 
             return generator.GetDistribution();
-        }
-        
-        protected override void Resolve()
-        {
-        }
-
-        protected override void OnStart()
-        {
         }
     }
 }

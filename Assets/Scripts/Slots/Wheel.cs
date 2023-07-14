@@ -1,4 +1,5 @@
-﻿using CommonTools.Runtime.DependencyInjection;
+﻿using System.Collections.Generic;
+using CommonTools.Runtime.DependencyInjection;
 using DG.Tweening;
 using Events;
 using Events.Implementations.Slots;
@@ -13,89 +14,127 @@ namespace Slots
         [SerializeField] private WheelLocation m_location;
         [SerializeField] private RectTransform m_spinner;
 
-        private Vector2[] m_symbolPositions;
-
-        private SymbolFactory m_symbolFactory;
+        private readonly Queue<Symbol> m_symbolQueue = new Queue<Symbol>();
         
         private RectTransform m_rect;
-        
-        private const int symbolQueueSize = 5; // must be odd to start with a symbol in the middle
-        private const float symbolDistance = 275f; // in terms of pixels
+        private SymbolFactory m_symbolFactory;
+        private Symbol m_topSymbol;
 
         public static float BottomY;
         private static bool isBottomYSet;
-        
-        
+
+        private const int initialSymbolCount = 5; // must be odd to start with a symbol in the middle
+        private const float symbolDistance = 275f; // in terms of pixels
+
+
         private void Awake()
         {
             m_rect = GetComponent<RectTransform>();
-            SetSymbolLocations();
-            
             GameEventSystem.AddListener<SymbolDisappearedEvent>(OnSymbolDisappeared);
         }
 
         private void Start()
         {
             m_symbolFactory = DI.Resolve<SymbolFactory>();
-            
             LoadInitialSymbols();
-            SetBottomY();
         }
 
         public void Spin(float time, float speed)
         {
             var distance = time * speed;
-            m_spinner.DOAnchorPos(distance * Vector2.down, time);
+            distance += distance % symbolDistance;
+
+            m_spinner.DOAnchorPos(distance * Vector2.down, time).OnComplete(ResetSpinner);
         }
-        
-        private void OnSymbolDisappeared(object location)
+
+        private void OnSymbolDisappeared(object symbol)
         {
-            if ((WheelLocation)location == m_location)
-                AddSymbol();
+            RemoveSymbolFromBottom();
+            AddSymbolToTop();
         }
-        
-        private void AddSymbol()
+
+        private void AddSymbolToTop()
         {
-            var symbol = m_symbolFactory.Get(SymbolType.A);
-            symbol.SetParent(m_rect);
-            symbol.SetPosition(m_symbolPositions[symbolQueueSize - 1]);
-            symbol.SetParent(m_spinner);
+            var symbol = m_symbolFactory.Get(SymbolType.Wild);
             symbol.SetWheel(m_location);
+            symbol.SetParent(m_rect);
+
+            var pos = m_topSymbol.AnchoredPos + symbolDistance * Vector2.up;
+
+            symbol.SetPosition(pos);
+            symbol.SetParent(m_spinner);
+
+            m_topSymbol = symbol;
+            m_symbolQueue.Enqueue(symbol);
         }
 
-        private void SetSymbolLocations()
+        private void RemoveSymbolFromBottom()
         {
-            m_symbolPositions = new Vector2[symbolQueueSize];
+            var symbol = m_symbolQueue.Dequeue();
+            m_symbolFactory.Return(symbol);
+        }
 
-            var startPos = -(symbolQueueSize / 2) * symbolDistance * Vector2.up;
-            
-            for (int i = 0; i < symbolQueueSize; i++)
+        private void ResetSpinner()
+        {
+            var count = m_symbolQueue.Count;
+            var symbols = new Symbol[count];
+
+            for (int i = 0; i < count; i++)
             {
-                m_symbolPositions[i] = startPos + (i * symbolDistance) * Vector2.up;
+                var symbol = m_symbolQueue.Dequeue();
+                symbols[i] = symbol;
+                symbol.SetParent(m_rect, true);
+            }
+
+            m_spinner.anchoredPosition = Vector2.zero;
+            
+            for (int i = 0; i < count; i++)
+            {
+                var symbol = symbols[i];
+                symbol.SetParent(m_spinner, true);
+                m_symbolQueue.Enqueue(symbol);
             }
         }
 
         private void LoadInitialSymbols()
         {
-            for (int i = 0; i < symbolQueueSize - 1; i++)
+            var startPos = -(initialSymbolCount / 2) * symbolDistance * Vector2.up;
+            
+            for (int i = 0; i < initialSymbolCount; i++)
             {
-                var symbol = m_symbolFactory.Get(SymbolType.Bonus);
-                var pos = m_symbolPositions[i];
+                var pos = startPos + (i * symbolDistance) * Vector2.up;
 
-                symbol.SetParent(m_spinner);
-                symbol.SetPosition(pos);
-                symbol.SetWheel(m_location);
+                if (i == 0)
+                {
+                    if (isBottomYSet)
+                        continue;
+                    
+                    SetBottomY(startPos);
+                }
+                else
+                {
+                    var symbol = m_symbolFactory.Get(SymbolType.Bonus);
+                    
+                    symbol.SetParent(m_spinner);
+                    symbol.SetPosition(pos);
+                    symbol.SetWheel(m_location);
+                
+                    m_symbolQueue.Enqueue(symbol);
+                    
+                    if (i == initialSymbolCount - 1)
+                        m_topSymbol = symbol;
+                }
             }
         }
 
-        private void SetBottomY()
+        private void SetBottomY(Vector2 bottomPos)
         {
             if (isBottomYSet)
                 return;
             
             var symbol = m_symbolFactory.Get(SymbolType.A);
-            symbol.SetParent(m_spinner);
-            symbol.SetPosition(m_symbolPositions[0]);
+            symbol.SetParent(m_rect);
+            symbol.SetPosition(bottomPos);
 
             BottomY = symbol.transform.position.y;
             
