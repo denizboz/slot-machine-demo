@@ -26,10 +26,16 @@ namespace Slots
         private const int initialSymbolCount = 5; // must be odd to start with a symbol in the middle
         private const float symbolDistance = 275f; // in terms of pixels
 
+        private SymbolTypeSequenceGenerator m_sequenceGenerator;
+        private SymbolType[] m_typeSequence;
+        private int m_sequenceIndex;
 
+        
         private void Awake()
         {
             m_rect = GetComponent<RectTransform>();
+            m_sequenceGenerator = new SymbolTypeSequenceGenerator();
+            
             GameEventSystem.AddListener<SymbolDisappearedEvent>(OnSymbolDisappeared);
         }
 
@@ -44,6 +50,19 @@ namespace Slots
             var distance = time * speed;
             distance += distance % symbolDistance;
 
+            // debug purpose
+            var testType = m_location switch
+            {
+                WheelLocation.Left => SymbolType.A,
+                WheelLocation.Middle => SymbolType.Jackpot,
+                _ => SymbolType.A
+            };
+            
+            var sequenceSize = (int)distance / (int)symbolDistance;
+            m_typeSequence = m_sequenceGenerator.GetSequence(testType, sequenceSize);
+
+            m_sequenceIndex = 0;
+            
             m_spinner.DOAnchorPos(distance * Vector2.down, time).OnComplete(ResetSpinner);
         }
 
@@ -55,7 +74,12 @@ namespace Slots
 
         private void AddSymbolToTop()
         {
-            var symbol = m_symbolFactory.Get(SymbolType.Wild);
+            Debug.Log($"{m_sequenceIndex} vs {m_typeSequence.Length}");
+            
+            var type = m_typeSequence[m_sequenceIndex];
+            // var type = m_sequenceGenerator.GetRandomSingle();
+            
+            var symbol = m_symbolFactory.Get(type);
             symbol.SetWheel(m_location);
             symbol.SetParent(m_rect);
 
@@ -66,6 +90,8 @@ namespace Slots
 
             m_topSymbol = symbol;
             m_symbolQueue.Enqueue(symbol);
+
+            m_sequenceIndex++;
         }
 
         private void RemoveSymbolFromBottom()
@@ -104,27 +130,24 @@ namespace Slots
             {
                 var pos = startPos + (i * symbolDistance) * Vector2.up;
 
-                if (i == 0)
-                {
-                    if (isBottomYSet)
-                        continue;
-                    
-                    SetBottomY(startPos);
-                }
-                else
-                {
-                    var symbol = m_symbolFactory.Get(SymbolType.Bonus);
-                    
-                    symbol.SetParent(m_spinner);
-                    symbol.SetPosition(pos);
-                    symbol.SetWheel(m_location);
+                if (i == 0 && !isBottomYSet)
+                    SetBottomY(startPos - symbolDistance * Vector2.up);
                 
-                    m_symbolQueue.Enqueue(symbol);
+                var symbolType = m_sequenceGenerator.GetRandomSingle();
+                var symbol = m_symbolFactory.Get(symbolType);
                     
-                    if (i == initialSymbolCount - 1)
-                        m_topSymbol = symbol;
-                }
+                symbol.SetParent(m_spinner);
+                symbol.SetPosition(pos);
+                symbol.SetWheel(m_location);
+                
+                m_symbolQueue.Enqueue(symbol);
+                    
+                if (i == initialSymbolCount - 1)
+                    m_topSymbol = symbol;
             }
+            
+            if (!isBottomYSet)
+                SetBottomY(startPos - symbolDistance * Vector2.up);
         }
 
         private void SetBottomY(Vector2 bottomPos)

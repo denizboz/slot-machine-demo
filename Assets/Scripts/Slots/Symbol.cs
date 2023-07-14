@@ -16,6 +16,7 @@ namespace Slots
         public SymbolType Type { get; private set; }
         public WheelLocation ParentWheel { get; private set; }
         public Vector2 AnchoredPos => m_rect.anchoredPosition;
+        public Vector3 WorldPos => transform.position;
         
         private void Update()
         {

@@ -53,7 +53,7 @@ namespace Slots
                 // var wheel = wheels[i];
                 // GameTask.Wait(delays[i]).Do((() => wheel.Spin(2.5f, 5000f)));
                 
-                wheels[i].Spin(2.5f, 5000f);
+                wheels[i].Spin(2.5f, 3000f);
             }
         }
 
