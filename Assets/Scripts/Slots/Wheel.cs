@@ -72,16 +72,16 @@ namespace Slots
             {
                 var type = typeSequence[i];
                 var pos = m_topSymbol.AnchoredPos + (i + 1) * symbolDistance * Vector2.up;
+
+                var visibleStart = count - visibleSymbolCount;
                 
-                var symbol = m_symbolFactory.Get(type);
+                var symbol = m_symbolFactory.Get(type, blurred: i < visibleStart);
                 
                 symbol.SetParent(m_rect);
                 
                 symbol.SetPosition(pos);
                 symbol.SetParent(m_spinner);
 
-                var visibleStart = count - visibleSymbolCount;
-                
                 // register new visible symbols
                 if (i > visibleStart - 1)
                     m_visibleSymbols[i - visibleStart] = symbol;

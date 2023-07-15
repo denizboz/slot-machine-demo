@@ -49,18 +49,6 @@ namespace Managers
             m_symbolPool.Enqueue(symbol);
         }
 
-        public void SwitchSharp(Symbol symbol)
-        {
-            var sharpSprite = m_spriteContainer.GetSprite(symbol.Type, blurred: false);
-            symbol.SetSprite(sharpSprite);
-        }
-        
-        public void SwitchBlurred(Symbol symbol)
-        {
-            var blurredSprite = m_spriteContainer.GetSprite(symbol.Type, blurred: true);
-            symbol.SetSprite(blurredSprite);
-        }
-        
         private void CreatePool()
         {
             m_symbolPool = new Queue<Symbol>(poolSize);
