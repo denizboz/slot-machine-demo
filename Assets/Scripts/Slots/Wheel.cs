@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using CommonTools.Runtime.DependencyInjection;
 using DG.Tweening;
+using Events;
+using Events.Implementations;
 using Managers;
 using UnityEngine;
 using Utility;
@@ -51,8 +53,9 @@ namespace Slots
             UnloadSymbols();
             ResetSpinner();
             LoadSymbols(typeSequence);
-            
-            m_spinner.DOAnchorPos(distance * Vector2.down, time).SetEase(Ease.OutQuad);
+
+            m_spinner.DOAnchorPos(distance * Vector2.down, time).SetEase(Ease.OutQuad)
+                .OnComplete(() => GameEventSystem.Invoke<WheelSpinCompletedEvent>());
         }
         
         private void LoadSymbols(SymbolType[] typeSequence)

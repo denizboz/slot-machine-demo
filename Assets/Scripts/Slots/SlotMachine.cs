@@ -1,5 +1,8 @@
 ﻿using System.Linq;
 using CommonTools.Runtime.DependencyInjection;
+using CommonTools.Runtime.TaskManagement;
+using Events;
+using Events.Implementations;
 using UnityEngine;
 using Utility;
 
@@ -30,56 +33,67 @@ namespace Slots
 
             m_currentRound = PlayerPrefs.GetInt(keyForCurrentRound);
             m_totalRoundCount = m_probDistribution.GetTotalOccurenceCount();
-
-            m_currentRound %= m_totalRoundCount;
             
             if (m_currentRound == 0)
-            {
-                Debug.Log("FIRST SAVE");
-                
-                m_lineups = CreateNewDistribution();
-                DataSystem.SaveBinary(m_lineups);
-
-                foreach (var lineup in m_lineups)
-                {
-                    Debug.Log($"{lineup.Left} | {lineup.Middle} | {lineup.Right}");
-                }
-            }
+                RefreshData();
             else
-            {
-                Debug.Log("LOAD");
-                
-                m_lineups = DataSystem.LoadBinary<Lineup>();
-                
-                foreach (var lineup in m_lineups)
-                {
-                    Debug.Log($"{lineup.Left} | {lineup.Middle} | {lineup.Right}");
-                }
-            }
+                LoadData();
+        }
+
+        private void Start()
+        {
+            GameEventSystem.Invoke<WheelsRegisteredEvent>(3);
         }
 
         public void Spin()
         {
-            PlayerPrefs.SetInt(keyForCurrentRound, m_currentRound);
-            
             var symbolTypes = m_lineups[m_currentRound].GetSymbolTypes();
             
             var delays = new float[m_wheels.Length];
             
             for (var i = 0; i < m_wheels.Length; i++)
             {
-                var delay = Random.Range(0.2f, 0.5f);
+                var delay = Random.Range(0.1f, 0.33f);
                 delays[i] = i == 0 ? delay : delays[i - 1] + delay;
             }
             
             for (var i = 0; i < m_wheels.Length; i++)
             {
-                m_wheels[i].Spin(symbolTypes[i],2.5f, 3000f);
+                var di = i;
+                GameTask.Wait(delays[i]).Do(() => m_wheels[di].Spin(symbolTypes[di], 2.5f, 3000f));
             }
 
-            m_currentRound++;
+            GameEventSystem.Invoke<FullSpinStartedEvent>();
+            
+            ManageRound();
         }
 
+        private void ManageRound()
+        {
+            m_currentRound++;
+            m_currentRound %= m_totalRoundCount;
+            
+            PlayerPrefs.SetInt(keyForCurrentRound, m_currentRound);
+
+            if (m_currentRound == 0)
+                RefreshData();
+        }
+
+        private void RefreshData()
+        {
+            m_lineups = CreateNewDistribution();
+            DataSystem.SaveBinary(m_lineups);
+
+            Debug.Log($"New lineup distribution created & saved.");
+        }
+
+        private void LoadData()
+        {
+            m_lineups = DataSystem.LoadBinary<Lineup>();
+                
+            Debug.Log($"Lineup distribution loaded from saved data.");
+        }
+        
         private Lineup[] CreateNewDistribution()
         {
             var lineupOccurrences = m_probDistribution.LineupOccurrences;
