@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Utility
 {
-    [CreateAssetMenu(fileName = "SpriteContainer", menuName = "Data/New Sprite Container", order = 0)]
+    [CreateAssetMenu(fileName = "SpriteContainer", menuName = "Data/New Sprite Container")]
     public class SpriteContainerSO : ScriptableObject
     {
         [SerializeField] private Sprite[] m_sharpSprites;

@@ -180,7 +180,7 @@ GameObject:
   - component: {fileID: 194074603}
   - component: {fileID: 194074602}
   m_Layer: 5
-  m_Name: MainCanvas
+  m_Name: WorldCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -501,6 +501,12 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
+--- !u!198 &468870159 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 7222859015008228546, guid: f4857763e76165b48a08e13c23e75ecc,
+    type: 3}
+  m_PrefabInstance: {fileID: 7222859014663139533}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &515419473 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8813495176715640936, guid: 8abf4ed7b16ea3d43b273c2bd75c4c4e,
@@ -735,6 +741,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e196e956fd784464a7e313b81314005e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_coinParticles: {fileID: 468870159}
 --- !u!1001 &7222859014663139533
 PrefabInstance:
   m_ObjectHideFlags: 0

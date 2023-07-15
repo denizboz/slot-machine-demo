@@ -10,8 +10,9 @@ namespace Slots
 {
     public class SlotMachine : MonoBehaviour
     {
+        [SerializeField] private ParametersSO m_parameters;
         [SerializeField] private ProbDistributionSO m_probDistribution;
-        // prob dist can also be loaded by Resources.Load(), depending on preference.
+        // scriptable objects can also be loaded by Resources.Load(), depending on preference.
 
         private Wheel[] m_wheels;
         private Lineup[] m_lineups;
