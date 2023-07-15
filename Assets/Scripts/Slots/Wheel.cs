@@ -41,7 +41,7 @@ namespace Slots
             FillInitial();
         }
 
-        public void Spin(SymbolType targetType, float time, float speed)
+        public void Spin(SymbolType targetType, float time, float speed, Ease ease = Ease.Linear)
         {
             var distance = time * speed;
             distance -= distance % symbolDistance;
@@ -55,7 +55,7 @@ namespace Slots
             LoadSymbols(typeSequence);
 
             m_spinner.DOAnchorPos(distance * Vector2.down, time).SetEase(Ease.OutQuad)
-                .OnComplete(() => GameEventSystem.Invoke<WheelSpinCompletedEvent>());
+                .OnComplete(() => GameEventSystem.Invoke<WheelSpinCompletedEvent>(targetType));
         }
         
         private void LoadSymbols(SymbolType[] typeSequence)

@@ -13,7 +13,10 @@ MonoBehaviour:
   m_Name: GameParameters
   m_EditorClassIdentifier: 
   BaseSpinDuration: 1
-  RewardedSlowDownTime: 1
-  JackpotSlowDownTime: 2.25
+  LastSpinStopDelay: 1
+  RewardedSpinStopDelay: 2.25
+  SpinDelayMin: 0.1
+  SpinDelayMax: 0.33
   WheelSpeed: 3000
   CoinAnimDuration: 1.5
+  BaseCoinParticleRate: 10

@@ -741,6 +741,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e196e956fd784464a7e313b81314005e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_parameters: {fileID: 11400000, guid: 569cba8c924055747ab3febf97750989, type: 2}
   m_coinParticles: {fileID: 468870159}
 --- !u!1001 &7222859014663139533
 PrefabInstance:

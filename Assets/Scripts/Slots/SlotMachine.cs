@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using CommonTools.Runtime.DependencyInjection;
 using CommonTools.Runtime.TaskManagement;
+using DG.Tweening;
 using Events;
 using Events.Implementations;
 using UnityEngine;
@@ -12,10 +13,19 @@ namespace Slots
     {
         [SerializeField] private ParametersSO m_parameters;
         [SerializeField] private ProbDistributionSO m_probDistribution;
-        // scriptable objects can also be loaded by Resources.Load(), depending on preference.
+        // above objects can also be loaded by Resources.Load(), depending on preference.
 
         private Wheel[] m_wheels;
         private Lineup[] m_lineups;
+
+        private float m_baseSpinDuration;
+        private float m_lastSpinDuration;
+        private float m_rewardedSpinDuration;
+
+        private float m_spinDelayMin;
+        private float m_spinDelayMax;
+        
+        private float m_wheelSpeed;
 
         private int m_currentRound;
         private int m_totalRoundCount;
@@ -26,6 +36,7 @@ namespace Slots
         protected void Awake()
         {
             DI.Bind<SlotMachine>(this);
+            RegisterParameters();
 
             m_wheels = GetComponentsInChildren<Wheel>().OrderBy(wheel => (int)wheel.Location).ToArray();
             
@@ -43,25 +54,38 @@ namespace Slots
 
         private void Start()
         {
-            GameEventSystem.Invoke<WheelsRegisteredEvent>(3);
+            GameEventSystem.Invoke<WheelsRegisteredEvent>(m_wheels.Length);
         }
 
         public void Spin()
         {
+            var wheelCount = m_wheels.Length;
             var symbolTypes = m_lineups[m_currentRound].GetSymbolTypes();
             
-            var delays = new float[m_wheels.Length];
+            var delays = new float[wheelCount];
+            var durations = new float[wheelCount];
+            var easings = new Ease[wheelCount];
             
-            for (var i = 0; i < m_wheels.Length; i++)
+            for (var i = 0; i < wheelCount; i++)
             {
-                var delay = Random.Range(0.1f, 0.33f);
+                var delay = Random.Range(m_spinDelayMin, m_spinDelayMax);
                 delays[i] = i == 0 ? delay : delays[i - 1] + delay;
             }
+
+            for (int i = 0; i < wheelCount - 1; i++)
+            {
+                durations[i] = m_baseSpinDuration;
+                easings[i] = Ease.Linear;
+            }
+
+            durations[wheelCount - 1] = IsRewarding(symbolTypes) ? m_rewardedSpinDuration : m_lastSpinDuration;
+            easings[wheelCount - 1] = Ease.OutQuart;
             
-            for (var i = 0; i < m_wheels.Length; i++)
+            for (var i = 0; i < wheelCount; i++)
             {
                 var di = i;
-                GameTask.Wait(delays[i]).Do(() => m_wheels[di].Spin(symbolTypes[di], 2.5f, 3000f));
+                GameTask.Wait(delays[i]).Do(() =>
+                    m_wheels[di].Spin(symbolTypes[di], durations[di], m_wheelSpeed, easings[di]));
             }
 
             GameEventSystem.Invoke<FullSpinStartedEvent>();
@@ -69,6 +93,19 @@ namespace Slots
             ManageRound();
         }
 
+        private bool IsRewarding(SymbolType[] symbolTypes)
+        {
+            var isRewarding = true;
+            var firstType = symbolTypes[0];
+            
+            for (var i = 1; i < symbolTypes.Length; i++)
+            {
+                isRewarding = isRewarding && symbolTypes[i] == firstType;
+            }
+
+            return isRewarding;
+        }
+        
         private void ManageRound()
         {
             m_currentRound++;
@@ -91,7 +128,6 @@ namespace Slots
         private void LoadData()
         {
             m_lineups = DataSystem.LoadBinary<Lineup>();
-                
             Debug.Log($"Lineup distribution loaded from saved data.");
         }
         
@@ -101,6 +137,18 @@ namespace Slots
             var generator = new DistributionGenerator<Lineup>(lineupOccurrences);
 
             return generator.GetDistribution();
+        }
+
+        private void RegisterParameters()
+        {
+            m_baseSpinDuration = m_parameters.BaseSpinDuration;
+            m_lastSpinDuration = m_baseSpinDuration + m_parameters.LastSpinStopDelay;
+            m_rewardedSpinDuration = m_baseSpinDuration + m_parameters.RewardedSpinStopDelay;
+
+            m_spinDelayMin = m_parameters.SpinDelayMin;
+            m_spinDelayMax = m_parameters.SpinDelayMax;
+            
+            m_wheelSpeed = m_parameters.WheelSpeed;
         }
     }
 }
