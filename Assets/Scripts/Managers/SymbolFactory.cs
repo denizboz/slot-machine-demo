@@ -15,7 +15,7 @@ namespace Managers
         
         private Queue<Symbol> m_symbolPool;
 
-        private const int poolSize = 128;
+        private int poolSize = 128;
 
         protected override void Bind()
         {
@@ -29,10 +29,13 @@ namespace Managers
         
         public Symbol Get(SymbolType type, bool blurred = false)
         {
+            EnsurePoolCapacity();
+            
             var symbol = m_symbolPool.Dequeue();
             var sprite = m_spriteContainer.GetSprite(type, blurred);
 
             symbol.SetActive(true);
+            symbol.SetType(type);
             symbol.SetSprite(sprite);
             
             return symbol;
@@ -64,19 +67,31 @@ namespace Managers
             
             for (int i = 0; i < poolSize; i++)
             {
-                var symbol = Instantiate(m_symbolPrefab, m_poolParent);
-                
-                symbol.SetActive(false);
-                m_symbolPool.Enqueue(symbol);
+                AddSymbolToPool();
             }
         }
 
-        protected override void Resolve()
+        private void AddSymbolToPool()
         {
+            var symbol = Instantiate(m_symbolPrefab, m_poolParent);
+                
+            symbol.SetActive(false);
+            m_symbolPool.Enqueue(symbol);
         }
-
-        protected override void OnStart()
+        
+        private void EnsurePoolCapacity()
         {
+            if (m_symbolPool.Count > 0)
+                return;
+
+            poolSize *= 2;
+
+            for (int i = poolSize / 2; i < poolSize; i++)
+            {
+                AddSymbolToPool();
+            }
+            
+            Debug.LogWarning($"Symbol pool capacity increased from {(poolSize / 2).ToString()} to {poolSize.ToString()}");
         }
     }
 }

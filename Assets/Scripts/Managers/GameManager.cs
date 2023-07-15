@@ -14,13 +14,5 @@ namespace Managers
         {
             Application.targetFrameRate = 60;
         }
-
-        protected override void Resolve()
-        {
-        }
-
-        protected override void OnStart()
-        {
-        }
     }
 }

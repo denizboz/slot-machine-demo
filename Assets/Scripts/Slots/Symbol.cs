@@ -1,8 +1,4 @@
-﻿using CommonTools.Runtime.DependencyInjection;
-using Events;
-using Events.Implementations.Slots;
-using Managers;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using Utility;
 
@@ -10,18 +6,17 @@ namespace Slots
 {
     public class Symbol : MonoBehaviour
     {
+        public SymbolType Type { get; private set; }
+        
         [SerializeField] private RectTransform m_rect;
         [SerializeField] private Image m_image;
         
-        public SymbolType Type { get; private set; }
-        public WheelLocation ParentWheel { get; private set; }
         public Vector2 AnchoredPos => m_rect.anchoredPosition;
-        public Vector3 WorldPos => transform.position;
         
-        private void Update()
+
+        public void SetType(SymbolType type)
         {
-            if (m_rect.position.y < Wheel.BottomY)
-                GameEventSystem.Invoke<SymbolDisappearedEvent>(this);
+            Type = type;
         }
         
         public void SetSprite(Sprite sprite)
@@ -39,11 +34,6 @@ namespace Slots
             m_rect.SetParent(parent, worldPositionStays);
         }
 
-        public void SetWheel(WheelLocation location)
-        {
-            ParentWheel = location;
-        }
-        
         public void SetActive(bool active)
         {
             gameObject.SetActive(active);

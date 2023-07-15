@@ -4,14 +4,14 @@ using Random = UnityEngine.Random;
 
 namespace Utility
 {
-    public class SymbolTypeSequenceGenerator
+    public class TypeSequenceGenerator
     {
         private static readonly SymbolType[] possibleSymbolTypes;
         private static readonly int varietySize;
 
         private SymbolType m_lastRandomType;
         
-        static SymbolTypeSequenceGenerator()
+        static TypeSequenceGenerator()
         {
             possibleSymbolTypes = Enum.GetValues(typeof(SymbolType)) as SymbolType[];
             possibleSymbolTypes = possibleSymbolTypes.OrderBy(type => (int)type).ToArray();
@@ -19,14 +19,25 @@ namespace Utility
             varietySize = possibleSymbolTypes.Length;
         }
 
-        public SymbolType[] GetSequence(SymbolType targetType, int size)
+        public SymbolType[] GetSequence(SymbolType targetType, int size, int extraFill)
         {
             var symbolSequence = new SymbolType[size];
 
-            symbolSequence[size - 1] = targetType;
+            var targetIndex = size - extraFill - 1;
+            
+            symbolSequence[targetIndex] = targetType;
             m_lastRandomType = targetType;
             
-            for (int i = size - 2; i >= 0; i--)
+            // fill below target type
+            for (int i = targetIndex - 1; i >= 0; i--)
+            {
+                symbolSequence[i] = GetRandomSingle();
+            }
+
+            m_lastRandomType = targetType;
+            
+            // fill after target type
+            for (int i = targetIndex + 1; i < size; i++)
             {
                 symbolSequence[i] = GetRandomSingle();
             }
