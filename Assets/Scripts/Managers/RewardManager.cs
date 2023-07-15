@@ -63,20 +63,20 @@ namespace Managers
 
             m_completedSpinCount = 0;
             
-            if (IsLineupRewarding())
+            if (IsLineupRewarding(m_symbolTypeLineup))
                 PlayRewardAnimation(m_symbolTypeLineup[0]);
             else
                 GameEventSystem.Invoke<RewardingCompletedEvent>();
         }
 
-        private bool IsLineupRewarding()
+        public bool IsLineupRewarding(SymbolType[] symbolTypeLineup)
         {
-            var firstSymbol = m_symbolTypeLineup[0];
+            var firstSymbol = symbolTypeLineup[0];
             var isRewarding = true;
 
-            for (var i = 1; i < m_symbolTypeLineup.Length; i++)
+            for (var i = 1; i < symbolTypeLineup.Length; i++)
             {
-                isRewarding = isRewarding && m_symbolTypeLineup[i] == firstSymbol;
+                isRewarding = isRewarding && symbolTypeLineup[i] == firstSymbol;
             }
 
             return isRewarding;

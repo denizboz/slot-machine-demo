@@ -4,6 +4,7 @@ using CommonTools.Runtime.TaskManagement;
 using DG.Tweening;
 using Events;
 using Events.Implementations;
+using Managers;
 using UnityEngine;
 using Utility;
 
@@ -15,6 +16,8 @@ namespace Slots
         [SerializeField] private ProbDistributionSO m_probDistribution;
         // above objects can also be loaded by Resources.Load(), depending on preference.
 
+        private RewardManager m_rewardManager;
+        
         private Wheel[] m_wheels;
         private Lineup[] m_lineups;
 
@@ -54,6 +57,7 @@ namespace Slots
 
         private void Start()
         {
+            m_rewardManager = DI.Resolve<RewardManager>();
             GameEventSystem.Invoke<WheelsRegisteredEvent>(m_wheels.Length);
         }
 
@@ -78,7 +82,9 @@ namespace Slots
                 easings[i] = Ease.Linear;
             }
 
-            durations[wheelCount - 1] = IsRewarding(symbolTypes) ? m_rewardedSpinDuration : m_lastSpinDuration;
+            var isRewarding = m_rewardManager.IsLineupRewarding(symbolTypes);
+            
+            durations[wheelCount - 1] = isRewarding ? m_rewardedSpinDuration : m_lastSpinDuration;
             easings[wheelCount - 1] = Ease.OutQuart;
             
             for (var i = 0; i < wheelCount; i++)
@@ -93,19 +99,6 @@ namespace Slots
             ManageRound();
         }
 
-        private bool IsRewarding(SymbolType[] symbolTypes)
-        {
-            var isRewarding = true;
-            var firstType = symbolTypes[0];
-            
-            for (var i = 1; i < symbolTypes.Length; i++)
-            {
-                isRewarding = isRewarding && symbolTypes[i] == firstType;
-            }
-
-            return isRewarding;
-        }
-        
         private void ManageRound()
         {
             m_currentRound++;
