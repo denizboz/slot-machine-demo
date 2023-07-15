@@ -22,5 +22,10 @@ namespace Utility
         public SymbolType Left;
         public SymbolType Middle;
         public SymbolType Right;
+
+        public SymbolType[] GetSymbolTypes()
+        {
+            return new[] { Left, Middle, Right };
+        }
     }
 }

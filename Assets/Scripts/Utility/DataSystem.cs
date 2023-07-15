@@ -7,14 +7,20 @@ namespace Utility
 {
     public static class DataSystem
     {
-        private const string binaryPath = "SavedData/data.bin";
+        private const string directory = "SavedData";
+        private const string fileName = "data.bin";
 
 
         public static void SaveBinary<T>(T[] items)
         {
-            var path = Path.Combine(Application.persistentDataPath, binaryPath);
+            var directoryPath = Path.Combine(Application.persistentDataPath, directory);
+            var filePath = Path.Combine(directory, fileName);
+
+            bool fileExists = File.Exists(filePath);
+
+            var path = fileExists ? filePath : directoryPath;
+            var fileMode = fileExists ? FileMode.Open : FileMode.Create;
             
-            var fileMode = File.Exists(path) ? FileMode.Open : FileMode.Create;
             var stream = new FileStream(path, fileMode);
             
             BinaryFormatter formatter = new BinaryFormatter();
@@ -25,7 +31,7 @@ namespace Utility
         
         public static T[] LoadBinary<T>()
         {
-            var path = Path.Combine(Application.persistentDataPath, binaryPath);
+            var path = Path.Combine(Application.persistentDataPath, directory);
 
             if (!File.Exists(path))
                 throw new Exception("Ensure the data saved first.");

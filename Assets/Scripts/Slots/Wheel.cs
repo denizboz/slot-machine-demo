@@ -9,7 +9,7 @@ namespace Slots
 {
     public class Wheel : MonoBehaviour
     {
-        [SerializeField] private WheelLocation m_location;
+        public WheelLocation Location;
         [SerializeField] private RectTransform m_spinner;
 
         private RectTransform m_rect;
@@ -39,22 +39,14 @@ namespace Slots
             FillInitial();
         }
 
-        public void Spin(float time, float speed)
+        public void Spin(SymbolType targetType, float time, float speed)
         {
             var distance = time * speed;
             distance -= distance % symbolDistance;
 
-            // debug purpose
-            var testType = m_location switch
-            {
-                WheelLocation.Left => SymbolType.A,
-                WheelLocation.Middle => SymbolType.Jackpot,
-                _ => SymbolType.A
-            };
-            
             var sequenceSize = (int)distance / (int)symbolDistance;
             var extraFill = visibleSymbolCount / 2;
-            var typeSequence = m_sequenceGenerator.GetSequence(testType, sequenceSize, extraFill);
+            var typeSequence = m_sequenceGenerator.GetSequence(targetType, sequenceSize, extraFill);
 
             UnloadSymbols();
             ResetSpinner();

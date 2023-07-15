@@ -1,5 +1,5 @@
-﻿using CommonTools.Runtime.DependencyInjection;
-using CommonTools.Runtime.TaskManagement;
+﻿using System.Linq;
+using CommonTools.Runtime.DependencyInjection;
 using UnityEngine;
 using Utility;
 
@@ -10,6 +10,9 @@ namespace Slots
         [SerializeField] private ProbDistributionSO m_probDistribution;
         // prob dist can also be loaded by Resources.Load(), depending on preference.
 
+        private Wheel[] m_wheels;
+        private Lineup[] m_lineups;
+
         private int m_currentRound;
         private int m_totalRoundCount;
 
@@ -19,9 +22,9 @@ namespace Slots
         protected void Awake()
         {
             DI.Bind<SlotMachine>(this);
-            
-            return;
 
+            m_wheels = GetComponentsInChildren<Wheel>().OrderBy(wheel => (int)wheel.Location).ToArray();
+            
             if (!PlayerPrefs.HasKey(keyForCurrentRound))
                 PlayerPrefs.SetInt(keyForCurrentRound, 0);
 
@@ -32,29 +35,49 @@ namespace Slots
             
             if (m_currentRound == 0)
             {
-                var newDistribution = CreateNewDistribution();
+                Debug.Log("FIRST SAVE");
+                
+                m_lineups = CreateNewDistribution();
+                DataSystem.SaveBinary(m_lineups);
+
+                foreach (var lineup in m_lineups)
+                {
+                    Debug.Log($"{lineup.Left} | {lineup.Middle} | {lineup.Right}");
+                }
+            }
+            else
+            {
+                Debug.Log("LOAD");
+                
+                m_lineups = DataSystem.LoadBinary<Lineup>();
+                
+                foreach (var lineup in m_lineups)
+                {
+                    Debug.Log($"{lineup.Left} | {lineup.Middle} | {lineup.Right}");
+                }
             }
         }
 
         public void Spin()
         {
-            var wheels = GetComponentsInChildren<Wheel>();
-
-            var delays = new float[wheels.Length];
+            PlayerPrefs.SetInt(keyForCurrentRound, m_currentRound);
             
-            for (var i = 0; i < delays.Length; i++)
+            var symbolTypes = m_lineups[m_currentRound].GetSymbolTypes();
+            
+            var delays = new float[m_wheels.Length];
+            
+            for (var i = 0; i < m_wheels.Length; i++)
             {
                 var delay = Random.Range(0.2f, 0.5f);
                 delays[i] = i == 0 ? delay : delays[i - 1] + delay;
             }
             
-            for (var i = 0; i < wheels.Length; i++)
+            for (var i = 0; i < m_wheels.Length; i++)
             {
-                // var wheel = wheels[i];
-                // GameTask.Wait(delays[i]).Do((() => wheel.Spin(2.5f, 5000f)));
-                
-                wheels[i].Spin(2.5f, 3000f);
+                m_wheels[i].Spin(symbolTypes[i],2.5f, 3000f);
             }
+
+            m_currentRound++;
         }
 
         private Lineup[] CreateNewDistribution()
