@@ -105,5 +105,11 @@ namespace Managers
                 m_coinParticleRates.Add(allSymbolTypes[i], (i + 1) * baseRate);
             }
         }
+
+        private void OnDestroy()
+        {
+            GameEventSystem.RemoveListener<WheelsRegisteredEvent>(OnWheelsRegistered);
+            GameEventSystem.RemoveListener<WheelSpinCompletedEvent>(OnOneSpinComplete);
+        }
     }
 }

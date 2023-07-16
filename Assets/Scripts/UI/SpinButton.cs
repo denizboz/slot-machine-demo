@@ -26,5 +26,11 @@ namespace UI
         {
             m_button.interactable = false;
         }
+
+        private void OnDestroy()
+        {
+            GameEventSystem.RemoveListener<FullSpinStartedEvent>(OnFullSpinStarted);
+            GameEventSystem.RemoveListener<RewardingCompletedEvent>(OnRewardingComplete);
+        }
     }
 }
