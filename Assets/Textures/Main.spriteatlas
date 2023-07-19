@@ -34,7 +34,6 @@ SpriteAtlas:
     packables:
     - {fileID: 102900000, guid: 442beba77b0febe4a95e6d4543618daf, type: 3}
     - {fileID: 102900000, guid: 5f20883f727eaee40aa9fbbffc1b3374, type: 3}
-    - {fileID: 102900000, guid: 53292f8eada40d944975872bcb75b1d2, type: 3}
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
@@ -43,7 +42,6 @@ SpriteAtlas:
   - {fileID: 21300000, guid: a9d70c6226bfc9f4fb09bc7633d050e4, type: 3}
   - {fileID: 21300000, guid: 9b6fd8d2d48a7a34d87c1779c59d5dfe, type: 3}
   - {fileID: 21300000, guid: 9708ab43d2e99cc4cb40bcc6b84b58e5, type: 3}
-  - {fileID: 21300000, guid: b5a3e134d3550184b84ea03e6afda1e3, type: 3}
   - {fileID: 21300000, guid: cf63edd558d83204283798d9a325a6e6, type: 3}
   - {fileID: 21300000, guid: 7650aca72b2934d4c835e349453a6e10, type: 3}
   - {fileID: 21300000, guid: b427ac0a051745248818b6b77d71d9fa, type: 3}
@@ -58,7 +56,6 @@ SpriteAtlas:
   - Slot_back
   - Wild_00_blur
   - Slot_gradient
-  - coins
   - A_00
   - Bonus_00
   - A_00_blur

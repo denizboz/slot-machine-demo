@@ -10,7 +10,14 @@ namespace Managers
             OnAwake();
         }
 
-        protected abstract void Bind();
-        protected abstract void OnAwake();
+        protected virtual void Bind()
+        {
+            // bind self to DI or DC
+        }
+
+        protected virtual void OnAwake()
+        {
+            // code to execute on Awake
+        }
     }
 }

@@ -19,7 +19,7 @@ namespace Managers
 
         protected override void Bind()
         {
-            DI.Bind<SymbolFactory>(this);
+            DI.Bind(this);
         }
 
         protected override void OnAwake()

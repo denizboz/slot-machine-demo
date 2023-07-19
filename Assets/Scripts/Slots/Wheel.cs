@@ -12,9 +12,10 @@ namespace Slots
     public class Wheel : MonoBehaviour
     {
         public WheelLocation Location;
+        
+        [SerializeField] private RectTransform m_rect;
         [SerializeField] private RectTransform m_spinner;
 
-        private RectTransform m_rect;
         private SymbolFactory m_symbolFactory;
         private Symbol m_topSymbol;
 
@@ -31,7 +32,6 @@ namespace Slots
 
         private void Awake()
         {
-            m_rect = GetComponent<RectTransform>();
             m_sequenceGenerator = new TypeSequenceGenerator();
         }
 

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace Utility
 {
@@ -12,6 +10,8 @@ namespace Utility
         private readonly int m_totalOccurrenceCount;
         
         private readonly List<int> m_availableIndices;
+
+        private readonly Random m_random;
 
 
         public DistributionGenerator(OccurrenceInfo<T>[] occurrences)
@@ -25,6 +25,8 @@ namespace Utility
             {
                 m_availableIndices.Add(i);
             }
+
+            m_random = new Random();
         }
         
         public T[] GetDistribution()
@@ -60,7 +62,7 @@ namespace Utility
         {
             var subList = m_availableIndices.Where(index => index >= min && index < max).ToList();
 
-            var index = subList.Count > 1 ? subList[Random.Range(0, subList.Count)] : GetClosestOutOfRange(min, max);
+            var index = subList.Count > 1 ? subList[m_random.Next(0, subList.Count)] : GetClosestOutOfRange(min, max);
             
             m_availableIndices.Remove(index);
             return index;
@@ -70,15 +72,15 @@ namespace Utility
         {
             int closest = m_availableIndices.Max();
             
-            var closestDistToMax = Mathf.Abs(max - closest);
-            var closestDistToMin = Mathf.Abs(closest - min);
+            var closestDistToMax = Math.Abs(max - closest);
+            var closestDistToMin = Math.Abs(closest - min);
             
             foreach (var index in m_availableIndices)
             {
-                var distToMax = Mathf.Abs(max - index);
-                var distToMin = Mathf.Abs(index - min);
-
-                if (closestDistToMax < distToMax || closestDistToMin < distToMin)
+                var distToMax = Math.Abs(max - index);
+                var distToMin = Math.Abs(index - min);
+            
+                if (distToMax < closestDistToMax || distToMin < closestDistToMin)
                     closest = index;
             }
 

@@ -27,7 +27,7 @@ namespace Managers
 
         protected override void Bind()
         {
-            DI.Bind<RewardManager>(this);
+            DI.Bind(this);
             
         }
 

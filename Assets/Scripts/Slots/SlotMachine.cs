@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using CommonTools.Runtime.DependencyInjection;
+﻿using CommonTools.Runtime.DependencyInjection;
 using CommonTools.Runtime.TaskManagement;
 using DG.Tweening;
 using Events;
@@ -16,9 +15,9 @@ namespace Slots
         [SerializeField] private ProbDistributionSO m_probDistribution;
         // above objects can also be loaded by Resources.Load(), depending on preference.
 
-        private RewardManager m_rewardManager;
+        [SerializeField] private Wheel[] m_wheels;
         
-        private Wheel[] m_wheels;
+        private RewardManager m_rewardManager;
         private Lineup[] m_lineups;
 
         private float m_baseSpinDuration;
@@ -38,16 +37,17 @@ namespace Slots
         
         protected void Awake()
         {
-            DI.Bind<SlotMachine>(this);
+            DI.Bind(this);
             RegisterParameters();
 
-            m_wheels = GetComponentsInChildren<Wheel>().OrderBy(wheel => (int)wheel.Location).ToArray();
-            
             if (!PlayerPrefs.HasKey(keyForCurrentRound))
                 PlayerPrefs.SetInt(keyForCurrentRound, 0);
 
             m_currentRound = PlayerPrefs.GetInt(keyForCurrentRound);
             m_totalRoundCount = m_probDistribution.GetTotalOccurenceCount();
+
+            var generator = new DistributionGenerator<Lineup>(m_probDistribution.LineupOccurrences);
+            DI.Bind(generator);
             
             if (m_currentRound == 0)
                 RefreshData();
@@ -126,9 +126,7 @@ namespace Slots
         
         private Lineup[] CreateNewDistribution()
         {
-            var lineupOccurrences = m_probDistribution.LineupOccurrences;
-            var generator = new DistributionGenerator<Lineup>(lineupOccurrences);
-
+            var generator = DI.Resolve<DistributionGenerator<Lineup>>();
             return generator.GetDistribution();
         }
 

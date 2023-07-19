@@ -9,6 +9,9 @@ namespace Events
 
         public void AddListener(Action<object> action)
         {
+            if (actions.Contains(action))
+                return;
+            
             actions.Add(action);
         }
 

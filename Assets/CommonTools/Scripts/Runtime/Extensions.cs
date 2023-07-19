@@ -141,6 +141,8 @@ namespace CommonTools.Runtime
                 stringBuilder.Remove(stringBuilder.Length - 2, 2);
                 Debug.Log(stringBuilder);
             }
+            
+            StringBuilderPool.Return(stringBuilder);
         }
         #endregion
 

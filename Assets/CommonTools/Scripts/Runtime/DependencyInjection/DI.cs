@@ -8,14 +8,14 @@ namespace CommonTools.Runtime.DependencyInjection
     {
         private static readonly Dictionary<Type, object> dictionary = new Dictionary<Type, object>(64);
 
-        public static void Bind<T>(T obj)
+        public static void Bind<T>(T dependency)
         {
             var type = typeof(T);
             
             if (dictionary.ContainsKey(type))
-                dictionary[type] = obj;
+                dictionary[type] = dependency;
             else
-                dictionary.Add(type, obj);
+                dictionary.Add(type, dependency);
         }
 
         public static T Resolve<T>()

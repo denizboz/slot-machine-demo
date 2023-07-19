@@ -24,9 +24,20 @@ namespace CommonTools.Runtime
             EnsurePoolCapacity();
             
             var builder = pool.Dequeue();
-            pool.Enqueue(builder);
             builder.Clear();
             return builder;
+        }
+
+        public static void Return(StringBuilder sb)
+        {
+            pool.Enqueue(sb);
+        }
+        
+        public static string GetStringAndReturn(StringBuilder sb)
+        {
+            var str = sb.ToString();
+            pool.Enqueue(sb);
+            return str;
         }
         
         private static void EnsurePoolCapacity()
