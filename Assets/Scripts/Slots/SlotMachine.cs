@@ -16,7 +16,7 @@ namespace Slots
 
         [SerializeField] private Wheel[] m_wheels;
 
-        private GameManager m_gameManager;
+        private DataManager m_dataManager;
         private RewardManager m_rewardManager;
         
         private Lineup[] m_lineups;
@@ -42,7 +42,7 @@ namespace Slots
 
         private void Start()
         {
-            m_gameManager = DI.Resolve<GameManager>();
+            m_dataManager = DI.Resolve<DataManager>();
             m_rewardManager = DI.Resolve<RewardManager>();
             
             GameEventSystem.Invoke<WheelsRegisteredEvent>(m_wheels.Length);
@@ -56,7 +56,7 @@ namespace Slots
         public void Spin()
         {
             var wheelCount = m_wheels.Length;
-            var symbolTypes = m_lineups[m_gameManager.CurrentRound].GetSymbolTypes();
+            var symbolTypes = m_lineups[m_dataManager.CurrentRound].GetSymbolTypes();
             
             var delays = new float[wheelCount];
             var durations = new float[wheelCount];
