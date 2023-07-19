@@ -5,6 +5,7 @@ using Events;
 using Events.Implementations;
 using Managers;
 using UnityEngine;
+using UnityEngine.UI;
 using Utility;
 
 namespace Slots
@@ -13,7 +14,7 @@ namespace Slots
     {
         [SerializeField] private ParametersSO m_parameters;
         // can also be loaded by Resources.Load(), depending on preference.
-
+        
         [SerializeField] private Wheel[] m_wheels;
 
         private DataManager m_dataManager;
@@ -38,6 +39,7 @@ namespace Slots
             
             GameEventSystem.AddListener<DataLoadedEvent>(OnDataLoaded);
             GameEventSystem.AddListener<DataRefreshedEvent>(OnDataLoaded);
+            GameEventSystem.AddListener<SpinButtonClickedEvent>(OnSpinButtonClicked);
         }
 
         private void Start()
@@ -53,7 +55,7 @@ namespace Slots
             m_lineups = (Lineup[])lineupArray;
         }
         
-        public void Spin()
+        private void OnSpinButtonClicked(object obj)
         {
             var wheelCount = m_wheels.Length;
             var symbolTypes = m_lineups[m_dataManager.CurrentRound].GetSymbolTypes();
@@ -99,6 +101,13 @@ namespace Slots
             m_spinDelayMax = m_parameters.SpinDelayMax;
             
             m_wheelSpeed = m_parameters.WheelSpeed;
+        }
+
+        private void OnDestroy()
+        {
+            GameEventSystem.RemoveListener<DataLoadedEvent>(OnDataLoaded);
+            GameEventSystem.RemoveListener<DataRefreshedEvent>(OnDataLoaded);
+            GameEventSystem.RemoveListener<SpinButtonClickedEvent>(OnSpinButtonClicked);
         }
     }
 }

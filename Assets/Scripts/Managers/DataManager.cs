@@ -86,5 +86,10 @@ namespace Managers
             
             return generator.GetDistribution();
         }
+
+        private void OnDestroy()
+        {
+            GameEventSystem.RemoveListener<FullSpinStartedEvent>(ManageRound);
+        }
     }
 }
