@@ -29,15 +29,14 @@ namespace Slots
         private Symbol[] m_visibleSymbols;
         private List<Symbol> m_invisibleSymbols;
 
-
-        private void Awake()
-        {
-            m_sequenceGenerator = new TypeSequenceGenerator();
-        }
-
+        
         private void Start()
         {
             m_symbolFactory = DI.Resolve<SymbolFactory>();
+            m_sequenceGenerator = DI.Resolve<TypeSequenceGenerator>();
+            
+            m_sequenceGenerator.RegisterWheel(this);
+            
             FillInitial();
         }
 
@@ -48,7 +47,7 @@ namespace Slots
 
             var sequenceSize = (int)distance / (int)symbolDistance;
             var extraFill = visibleSymbolCount / 2;
-            var typeSequence = m_sequenceGenerator.GetSequence(targetType, sequenceSize, extraFill);
+            var typeSequence = m_sequenceGenerator.GetSequence(this, targetType, sequenceSize, extraFill);
 
             UnloadSymbols();
             ResetSpinner();
@@ -129,7 +128,7 @@ namespace Slots
             {
                 var pos = startPos + (i * symbolDistance) * Vector2.up;
 
-                var symbolType = m_sequenceGenerator.GetRandomSingle();
+                var symbolType = m_sequenceGenerator.GetRandomSingle(this);
                 var symbol = m_symbolFactory.Get(symbolType);
                     
                 symbol.SetParent(m_spinner);

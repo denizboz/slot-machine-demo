@@ -1,4 +1,6 @@
-﻿using CommonTools.Runtime.DependencyInjection;
+﻿using System;
+using System.Linq;
+using CommonTools.Runtime.DependencyInjection;
 using Events;
 using Events.Implementations;
 using UnityEngine;
@@ -28,8 +30,14 @@ namespace Managers
             CurrentRound = PlayerPrefs.GetInt(keyForCurrentRound);
             m_totalRoundCount = m_probDistribution.GetTotalOccurenceCount();
 
-            var generator = new DistributionGenerator<Lineup>(m_probDistribution.LineupOccurrences);
-            DI.Bind(generator);
+            var distributionGenerator = new DistributionGenerator<Lineup>(m_probDistribution.LineupOccurrences);
+            DI.Bind(distributionGenerator);
+
+            var possibleSymbolTypes = Enum.GetValues(typeof(SymbolType)) as SymbolType[];
+            possibleSymbolTypes = possibleSymbolTypes.OrderBy(type => (int)type).ToArray();
+
+            var typeSequenceGenerator = new TypeSequenceGenerator(possibleSymbolTypes);
+            DI.Bind(typeSequenceGenerator);
             
             GameEventSystem.AddListener<FullSpinStartedEvent>(ManageRound);
         }

@@ -1,60 +1,75 @@
-﻿using System;
-using System.Linq;
+﻿using System.Collections.Generic;
+using Slots;
 using Random = UnityEngine.Random;
 
 namespace Utility
 {
     public class TypeSequenceGenerator
     {
-        private static readonly SymbolType[] possibleSymbolTypes;
-        private static readonly int varietySize;
+        private readonly SymbolType[] m_possibleSymbolTypes;
+        private readonly int m_varietySize;
 
-        private SymbolType m_lastRandomType;
+        private readonly Dictionary<Wheel, SymbolType> m_lastRandomTypeDict;
         
-        static TypeSequenceGenerator()
+        public TypeSequenceGenerator(SymbolType[] symbolTypes)
         {
-            possibleSymbolTypes = Enum.GetValues(typeof(SymbolType)) as SymbolType[];
-            possibleSymbolTypes = possibleSymbolTypes.OrderBy(type => (int)type).ToArray();
+            m_possibleSymbolTypes = symbolTypes;
+            m_varietySize = symbolTypes.Length;
 
-            varietySize = possibleSymbolTypes.Length;
+            m_lastRandomTypeDict = new Dictionary<Wheel, SymbolType>();
         }
 
-        public SymbolType[] GetSequence(SymbolType targetType, int size, int extraFill)
+        public void RegisterWheel(Wheel wheel)
+        {
+            var index = Random.Range(0, m_varietySize);
+            var randomType = m_possibleSymbolTypes[index];
+
+            if (m_lastRandomTypeDict.ContainsKey(wheel))
+                m_lastRandomTypeDict[wheel] = randomType;
+            else
+                m_lastRandomTypeDict.Add(wheel, randomType);
+        }
+        
+        public SymbolType[] GetSequence(Wheel wheel, SymbolType targetType, int size, int extraFill)
         {
             var symbolSequence = new SymbolType[size];
 
             var targetIndex = size - extraFill - 1;
-            
             symbolSequence[targetIndex] = targetType;
-            m_lastRandomType = targetType;
+            
+            m_lastRandomTypeDict[wheel] = targetType;
             
             // fill below target type
             for (int i = targetIndex - 1; i >= 0; i--)
             {
-                symbolSequence[i] = GetRandomSingle();
+                symbolSequence[i] = GetRandomSingle(wheel);
             }
 
-            m_lastRandomType = targetType;
+            m_lastRandomTypeDict[wheel] = targetType;
             
-            // fill after target type
+            // fill above target type
             for (int i = targetIndex + 1; i < size; i++)
             {
-                symbolSequence[i] = GetRandomSingle();
+                symbolSequence[i] = GetRandomSingle(wheel);
             }
 
             return symbolSequence;
         }
 
         // to ensure no subsequent identical symbols.
-        public SymbolType GetRandomSingle()
+        public SymbolType GetRandomSingle(Wheel wheel)
         {
             while (true)
             {
-                var index = Random.Range(0, varietySize);
-                var randomType = possibleSymbolTypes[index];
-
-                if (randomType == m_lastRandomType)
+                var index = Random.Range(0, m_varietySize);
+                
+                var randomType = m_possibleSymbolTypes[index];
+                var lastRandomType = m_lastRandomTypeDict[wheel];
+                
+                if (randomType == lastRandomType)
                     continue;
+
+                m_lastRandomTypeDict[wheel] = randomType;
                 
                 return randomType;
             }

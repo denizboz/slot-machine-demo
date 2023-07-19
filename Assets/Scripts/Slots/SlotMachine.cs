@@ -29,7 +29,7 @@ namespace Slots
         private float m_spinDelayMax;
         
         private float m_wheelSpeed;
-        
+
         
         protected void Awake()
         {
