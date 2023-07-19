@@ -9,9 +9,9 @@ namespace Utility
         private readonly OccurrenceInfo<T>[] m_occurrences;
         private readonly int m_totalOccurrenceCount;
         
-        private readonly List<int> m_availableIndices;
-
         private readonly Random m_random;
+
+        private readonly List<int> m_availableIndices;
 
 
         public DistributionGenerator(OccurrenceInfo<T>[] occurrences)
@@ -19,14 +19,20 @@ namespace Utility
             m_occurrences = occurrences;
             m_totalOccurrenceCount = occurrences.Sum(info => info.Occurrence);
             
+            m_random = new Random();
             m_availableIndices = new List<int>(m_totalOccurrenceCount);
+            
+            Reset();
+        }
+
+        public void Reset()
+        {
+            m_availableIndices.Clear();
 
             for (int i = 0; i < m_totalOccurrenceCount; i++)
             {
                 m_availableIndices.Add(i);
             }
-
-            m_random = new Random();
         }
         
         public T[] GetDistribution()

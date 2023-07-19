@@ -12,12 +12,13 @@ namespace Slots
     public class SlotMachine : MonoBehaviour
     {
         [SerializeField] private ParametersSO m_parameters;
-        [SerializeField] private ProbDistributionSO m_probDistribution;
-        // above objects can also be loaded by Resources.Load(), depending on preference.
+        // can also be loaded by Resources.Load(), depending on preference.
 
         [SerializeField] private Wheel[] m_wheels;
-        
+
+        private GameManager m_gameManager;
         private RewardManager m_rewardManager;
+        
         private Lineup[] m_lineups;
 
         private float m_baseSpinDuration;
@@ -28,43 +29,34 @@ namespace Slots
         private float m_spinDelayMax;
         
         private float m_wheelSpeed;
-
-        private int m_currentRound;
-        private int m_totalRoundCount;
-
-        private const string keyForCurrentRound = "current_round";
         
         
         protected void Awake()
         {
             DI.Bind(this);
             RegisterParameters();
-
-            if (!PlayerPrefs.HasKey(keyForCurrentRound))
-                PlayerPrefs.SetInt(keyForCurrentRound, 0);
-
-            m_currentRound = PlayerPrefs.GetInt(keyForCurrentRound);
-            m_totalRoundCount = m_probDistribution.GetTotalOccurenceCount();
-
-            var generator = new DistributionGenerator<Lineup>(m_probDistribution.LineupOccurrences);
-            DI.Bind(generator);
             
-            if (m_currentRound == 0)
-                RefreshData();
-            else
-                LoadData();
+            GameEventSystem.AddListener<DataLoadedEvent>(OnDataLoaded);
+            GameEventSystem.AddListener<DataRefreshedEvent>(OnDataLoaded);
         }
 
         private void Start()
         {
+            m_gameManager = DI.Resolve<GameManager>();
             m_rewardManager = DI.Resolve<RewardManager>();
+            
             GameEventSystem.Invoke<WheelsRegisteredEvent>(m_wheels.Length);
         }
 
+        private void OnDataLoaded(object lineupArray)
+        {
+            m_lineups = (Lineup[])lineupArray;
+        }
+        
         public void Spin()
         {
             var wheelCount = m_wheels.Length;
-            var symbolTypes = m_lineups[m_currentRound].GetSymbolTypes();
+            var symbolTypes = m_lineups[m_gameManager.CurrentRound].GetSymbolTypes();
             
             var delays = new float[wheelCount];
             var durations = new float[wheelCount];
@@ -95,39 +87,6 @@ namespace Slots
             }
 
             GameEventSystem.Invoke<FullSpinStartedEvent>();
-            
-            ManageRound();
-        }
-
-        private void ManageRound()
-        {
-            m_currentRound++;
-            m_currentRound %= m_totalRoundCount;
-            
-            PlayerPrefs.SetInt(keyForCurrentRound, m_currentRound);
-
-            if (m_currentRound == 0)
-                RefreshData();
-        }
-
-        private void RefreshData()
-        {
-            m_lineups = CreateNewDistribution();
-            DataSystem.SaveBinary(m_lineups);
-
-            Debug.Log($"New lineup distribution created & saved.");
-        }
-
-        private void LoadData()
-        {
-            m_lineups = DataSystem.LoadBinary<Lineup>();
-            Debug.Log($"Lineup distribution loaded from saved data.");
-        }
-        
-        private Lineup[] CreateNewDistribution()
-        {
-            var generator = DI.Resolve<DistributionGenerator<Lineup>>();
-            return generator.GetDistribution();
         }
 
         private void RegisterParameters()
