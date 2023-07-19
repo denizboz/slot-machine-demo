@@ -11,25 +11,20 @@ namespace Slots
 {
     public class Wheel : MonoBehaviour
     {
-        public WheelLocation Location;
-        
-        [SerializeField] private RectTransform m_rect;
-        [SerializeField] private RectTransform m_spinner;
+        [SerializeField] private Transform m_spinner;
 
         private SymbolFactory m_symbolFactory;
         private Symbol m_topSymbol;
 
-        private static bool isBottomYSet;
-
         private const int visibleSymbolCount = 3; // must be odd to start with a symbol in the middle
-        private const float symbolDistance = 275f; // in terms of pixels
+        private const float symbolDistance = 3.75f; 
 
         private TypeSequenceGenerator m_sequenceGenerator;
 
         private Symbol[] m_visibleSymbols;
         private List<Symbol> m_invisibleSymbols;
 
-        
+
         private void Start()
         {
             m_symbolFactory = DI.Resolve<SymbolFactory>();
@@ -44,16 +39,16 @@ namespace Slots
         {
             var distance = time * speed;
             distance -= distance % symbolDistance;
-
-            var sequenceSize = (int)distance / (int)symbolDistance;
+            
+            var sequenceSize = (int)(distance / symbolDistance);
             var extraFill = visibleSymbolCount / 2;
             var typeSequence = m_sequenceGenerator.GetSequence(this, targetType, sequenceSize, extraFill);
 
             UnloadSymbols();
             ResetSpinner();
             LoadSymbols(typeSequence);
-
-            m_spinner.DOAnchorPos(distance * Vector2.down, time).SetEase(Ease.OutQuad)
+            
+            m_spinner.DOLocalMove(distance * Vector3.down, time).SetEase(Ease.OutQuad)
                 .OnComplete(() => GameEventSystem.Invoke<WheelSpinCompletedEvent>(targetType));
         }
         
@@ -70,13 +65,13 @@ namespace Slots
             for (var i = 0; i < count; i++)
             {
                 var type = typeSequence[i];
-                var pos = m_topSymbol.AnchoredPos + (i + 1) * symbolDistance * Vector2.up;
+                var pos = m_topSymbol.LocalPos + (i + 1) * symbolDistance * Vector3.up;
 
                 var visibleStart = count - visibleSymbolCount;
                 
                 var symbol = m_symbolFactory.Get(type, blurred: i < visibleStart);
                 
-                symbol.SetParent(m_rect);
+                symbol.SetParent(transform);
                 
                 symbol.SetPosition(pos);
                 symbol.SetParent(m_spinner);
@@ -106,10 +101,10 @@ namespace Slots
         {
             for (int i = 0; i <visibleSymbolCount; i++)
             {
-                m_visibleSymbols[i].SetParent(m_rect, true);
+                m_visibleSymbols[i].SetParent(transform, true);
             }
 
-            m_spinner.anchoredPosition = Vector2.zero;
+            m_spinner.localPosition = Vector3.zero;
             
             for (int i = 0; i < visibleSymbolCount; i++)
             {
@@ -122,11 +117,11 @@ namespace Slots
             m_visibleSymbols = new Symbol[visibleSymbolCount];
             m_invisibleSymbols = new List<Symbol>();
             
-            var startPos = -(visibleSymbolCount / 2) * symbolDistance * Vector2.up;
+            var startPos = -(visibleSymbolCount / 2) * symbolDistance * Vector3.up;
             
             for (int i = 0; i < visibleSymbolCount; i++)
             {
-                var pos = startPos + (i * symbolDistance) * Vector2.up;
+                var pos = startPos + (i * symbolDistance) * Vector3.up;
 
                 var symbolType = m_sequenceGenerator.GetRandomSingle(this);
                 var symbol = m_symbolFactory.Get(symbolType);

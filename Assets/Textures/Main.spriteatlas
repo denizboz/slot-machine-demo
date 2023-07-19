@@ -47,6 +47,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: b427ac0a051745248818b6b77d71d9fa, type: 3}
   - {fileID: 21300000, guid: 2657248a222332d4e8f9244fefe02816, type: 3}
   - {fileID: 21300000, guid: c5044f4cbbbe55e488b2f7cbe47e6c9b, type: 3}
+  - {fileID: 21300000, guid: 267b084df8a8cf34aa4b608c3c7f66f3, type: 3}
   - {fileID: 21300000, guid: cae0c79daffc59445b87d9ada9f0b462, type: 3}
   - {fileID: 21300000, guid: bc7e30ad83590cc45a37d51b1459d154, type: 3}
   - {fileID: 21300000, guid: fec0945e50315ef4392b2cd4c2707c10, type: 3}
@@ -61,6 +62,7 @@ SpriteAtlas:
   - A_00_blur
   - Wild_00
   - Seven_00_blur
+  - white_mask
   - Seven_00
   - Bonus_00_blur
   - Jackpot_00_blur

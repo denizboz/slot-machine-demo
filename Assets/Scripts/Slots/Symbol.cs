@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using Utility;
 
 namespace Slots
@@ -8,10 +7,9 @@ namespace Slots
     {
         public SymbolType Type { get; private set; }
         
-        [SerializeField] private RectTransform m_rect;
-        [SerializeField] private Image m_image;
+        [SerializeField] private SpriteRenderer m_renderer;
         
-        public Vector2 AnchoredPos => m_rect.anchoredPosition;
+        public Vector3 LocalPos => transform.localPosition;
         
 
         public void SetType(SymbolType type)
@@ -21,17 +19,17 @@ namespace Slots
         
         public void SetSprite(Sprite sprite)
         {
-            m_image.sprite = sprite;
+            m_renderer.sprite = sprite;
         }
 
-        public void SetPosition(Vector2 pos)
+        public void SetPosition(Vector3 pos)
         {
-            m_rect.anchoredPosition = pos;
+            transform.localPosition = pos;
         }
 
-        public void SetParent(RectTransform parent, bool worldPositionStays = false)
+        public void SetParent(Transform parent, bool worldPositionStays = false)
         {
-            m_rect.SetParent(parent, worldPositionStays);
+            transform.SetParent(parent, worldPositionStays);
         }
 
         public void SetActive(bool active)

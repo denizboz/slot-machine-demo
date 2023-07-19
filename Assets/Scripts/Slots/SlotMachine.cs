@@ -5,7 +5,6 @@ using Events;
 using Events.Implementations;
 using Managers;
 using UnityEngine;
-using UnityEngine.UI;
 using Utility;
 
 namespace Slots

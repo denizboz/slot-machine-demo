@@ -17,6 +17,6 @@ MonoBehaviour:
   RewardedSpinStopDelay: 2.25
   SpinDelayMin: 0.1
   SpinDelayMax: 0.33
-  WheelSpeed: 3000
+  WheelSpeed: 35
   CoinAnimDuration: 1.5
   BaseCoinParticleRate: 10

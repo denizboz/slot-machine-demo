@@ -20,8 +20,8 @@ namespace Utility
         [Range(0.1f, 0.5f)]
         public float SpinDelayMax;
         
-        [Range(1000, 5000), Tooltip("Per second, in terms of pixels.")]
-        public int WheelSpeed;
+        [Range(10f, 50f), Tooltip("Per second.")]
+        public float WheelSpeed;
 
         [Range(1f, 5f)]
         public float CoinAnimDuration;

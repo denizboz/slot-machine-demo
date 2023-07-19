@@ -11,7 +11,7 @@ namespace Managers
         [SerializeField] private SpriteContainerSO m_spriteContainer;
         
         [SerializeField] private Symbol m_symbolPrefab;
-        [SerializeField] private RectTransform m_poolParent;
+        [SerializeField] private Transform m_poolParent;
         
         private Queue<Symbol> m_symbolPool;
 
