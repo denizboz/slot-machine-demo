@@ -45,17 +45,13 @@ namespace Utility
                 var item = rareToCommon[i].Item;
                 var count = rareToCommon[i].Occurrence;
 
-                var extender = m_totalOccurrenceCount % count == 0 ? 0 : 1;
-                var rangeStep = m_totalOccurrenceCount / count + extender;
-                var extra = m_totalOccurrenceCount % rangeStep;
-
-                for (int j = 0; j < count; j++)
+                var rangeSteps = GetHomogenousRangeSteps(m_totalOccurrenceCount, count);
+                
+                for (var k = 0; k < rangeSteps.Length; k++)
                 {
-                    var inExtraRange = j == count - 1 && extra != 0;
-
-                    var min = j * rangeStep;
-                    var max = inExtraRange ? m_totalOccurrenceCount : (j + 1) * rangeStep;
-
+                    var min = k == 0 ? 0 : rangeSteps[k - 1];
+                    var max = rangeSteps[k];
+                    
                     var index = GetUniqueIndexInRange(min, max);
                     distribution[index] = item;
                 }
@@ -68,29 +64,48 @@ namespace Utility
         {
             var subList = m_availableIndices.Where(index => index >= min && index < max).ToList();
 
-            var index = subList.Count > 1 ? subList[m_random.Next(0, subList.Count)] : GetClosestOutOfRange(min, max);
+            var index = subList.Count > 1 ? subList[m_random.Next(0, subList.Count)] : GetRandomIndex();
             
             m_availableIndices.Remove(index);
             return index;
         }
 
-        private int GetClosestOutOfRange(int min, int max)
+        private int GetRandomIndex()
         {
-            int closest = m_availableIndices.Max();
+            var rand = m_random.Next(0, m_availableIndices.Count);
+            return m_availableIndices[rand];
+        }
+
+        public static int[] GetHomogenousRangeSteps(int totalRange, int rangeCount)
+        {
+            if (rangeCount < 2)
+                throw new Exception("Range count must be greater than 1.");
             
-            var closestDistToMax = Math.Abs(max - closest);
-            var closestDistToMin = Math.Abs(closest - min);
+            if (totalRange < rangeCount)
+                throw new Exception("Total range must be greater than range count.");
             
-            foreach (var index in m_availableIndices)
+            var stepSize = totalRange / rangeCount;
+            
+            var rangeSteps = new int[rangeCount];
+
+            for (int i = 0; i < rangeCount; i++)
             {
-                var distToMax = Math.Abs(max - index);
-                var distToMin = Math.Abs(index - min);
-            
-                if (distToMax < closestDistToMax || distToMin < closestDistToMin)
-                    closest = index;
+                rangeSteps[i] = i != rangeCount - 1 ? (i + 1) * stepSize : totalRange;
             }
 
-            return closest;
+            var extra = totalRange - stepSize * rangeCount;
+            
+            if (extra == 0)
+                return rangeSteps;
+
+            var extraPerRange = stepSize > rangeCount ? extra / (rangeCount - 1) : 1;
+            
+            for (int i = 0; i < rangeCount - 1; i++)
+            {
+                rangeSteps[i] += (i + 1) * extraPerRange;
+            }
+
+            return rangeSteps;
         }
     }
     
