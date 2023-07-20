@@ -14,15 +14,22 @@ namespace Slots
         [SerializeField] private Transform m_spinner;
 
         private SymbolFactory m_symbolFactory;
+        private TypeSequenceGenerator m_sequenceGenerator;
+        
         private Symbol m_topSymbol;
+        private Symbol m_bottomSymbol;
 
         private const int visibleSymbolCount = 3; // must be odd to start with a symbol in the middle
+        private const int extraSymbolCount = 4; // must be even to add half bottom half top
+        
+        private const int symbolCount = visibleSymbolCount + extraSymbolCount;
         private const float symbolDistance = 3.75f; 
 
-        private TypeSequenceGenerator m_sequenceGenerator;
+        private readonly List<Symbol> m_symbolList = new List<Symbol>();
+        private SymbolType[] m_sequence;
+        private int m_sequenceIndex;
 
-        private Symbol[] m_visibleSymbols;
-        private List<Symbol> m_invisibleSymbols;
+        private float m_bottomY;
 
 
         private void Start()
@@ -35,91 +42,73 @@ namespace Slots
             FillInitial();
         }
 
+        private void Update()
+        {
+            if (m_bottomSymbol.WorldPos.y < m_bottomY)
+                TryUpdateSymbols();
+        }
+
+        private void TryUpdateSymbols()
+        {
+            var symbol = m_bottomSymbol;
+            m_symbolList.Remove(m_bottomSymbol);
+            m_symbolFactory.Return(symbol);
+
+            var visibleAndUp = visibleSymbolCount + extraSymbolCount / 2;
+            var blurred = m_sequenceIndex < m_sequence.Length - visibleAndUp;
+            var symbolType = m_sequence[m_sequenceIndex];
+            
+            symbol = m_symbolFactory.Get(symbolType, blurred);
+            symbol.SetParent(m_spinner);
+            symbol.SetPosition(m_topSymbol.LocalPos + symbolDistance * Vector3.up);
+            
+            m_symbolList.Add(symbol);
+
+            m_bottomSymbol = m_symbolList[0];
+            m_topSymbol = symbol;
+
+            m_sequenceIndex++;
+        }
+        
         public void Spin(SymbolType targetType, float time, float speed, Ease ease = Ease.Linear)
         {
             var distance = time * speed;
             distance -= distance % symbolDistance;
             
             var sequenceSize = (int)(distance / symbolDistance);
-            var extraFill = visibleSymbolCount / 2;
-            var typeSequence = m_sequenceGenerator.GetSequence(this, targetType, sequenceSize, extraFill);
+            var extraFill = symbolCount / 2;
 
-            UnloadSymbols();
+            m_sequenceIndex = 0;
+            m_sequence = m_sequenceGenerator.GetSequence(this, targetType, sequenceSize, extraFill);
+
             ResetSpinner();
-            LoadSymbols(typeSequence);
             
             m_spinner.DOLocalMove(distance * Vector3.down, time).SetEase(Ease.OutQuad)
                 .OnComplete(() => GameEventSystem.Invoke<WheelSpinCompletedEvent>(targetType));
         }
         
-        private void LoadSymbols(SymbolType[] typeSequence)
-        {
-            // add visibles to invisibles
-            foreach (var symbol in m_visibleSymbols)
-            {
-                m_invisibleSymbols.Add(symbol);
-            }
-            
-            var count = typeSequence.Length;
-            
-            for (var i = 0; i < count; i++)
-            {
-                var type = typeSequence[i];
-                var pos = m_topSymbol.LocalPos + (i + 1) * symbolDistance * Vector3.up;
-
-                var visibleStart = count - visibleSymbolCount;
-                
-                var symbol = m_symbolFactory.Get(type, blurred: i < visibleStart);
-                
-                symbol.SetParent(transform);
-                
-                symbol.SetPosition(pos);
-                symbol.SetParent(m_spinner);
-
-                // register new visible symbols
-                if (i > visibleStart - 1)
-                    m_visibleSymbols[i - visibleStart] = symbol;
-                else
-                    m_invisibleSymbols.Add(symbol);
-                
-                if (i == typeSequence.Length - 1)
-                    m_topSymbol = symbol;
-            }
-        }
-
-        private void UnloadSymbols()
-        {
-            foreach (var symbol in m_invisibleSymbols)
-            {
-                m_symbolFactory.Return(symbol);
-            }
-
-            m_invisibleSymbols.Clear();
-        }
-
         private void ResetSpinner()
         {
-            for (int i = 0; i <visibleSymbolCount; i++)
+            foreach (var symbol in m_symbolList)
             {
-                m_visibleSymbols[i].SetParent(transform, true);
+                symbol.SetParent(transform, true);
             }
-
+            
             m_spinner.localPosition = Vector3.zero;
             
-            for (int i = 0; i < visibleSymbolCount; i++)
+            foreach (var symbol in m_symbolList)
             {
-                m_visibleSymbols[i].SetParent(m_spinner, true);
+                symbol.SetParent(m_spinner, true);
             }
         }
 
         private void FillInitial()
         {
-            m_visibleSymbols = new Symbol[visibleSymbolCount];
-            m_invisibleSymbols = new List<Symbol>();
+            var startPos = -(symbolCount / 2) * symbolDistance * Vector3.up;
+
+            m_bottomY = startPos.y - symbolDistance / 2f;
             
-            var startPos = -(visibleSymbolCount / 2) * symbolDistance * Vector3.up;
-            
-            for (int i = 0; i < visibleSymbolCount; i++)
+            for (int i = 0; i < symbolCount; i++)
             {
                 var pos = startPos + (i * symbolDistance) * Vector3.up;
 
@@ -128,10 +117,12 @@ namespace Slots
                     
                 symbol.SetParent(m_spinner);
                 symbol.SetPosition(pos);
-                
-                m_visibleSymbols[i] = symbol;
-                
-                if (i == visibleSymbolCount - 1)
+
+                m_symbolList.Add(symbol);
+
+                if (i == 0)
+                    m_bottomSymbol = symbol;
+                else if (i == symbolCount - 1)
                     m_topSymbol = symbol;
             }
         }

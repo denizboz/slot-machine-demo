@@ -8,7 +8,8 @@ namespace Slots
         public SymbolType Type { get; private set; }
         
         [SerializeField] private SpriteRenderer m_renderer;
-        
+
+        public Vector3 WorldPos => transform.position;
         public Vector3 LocalPos => transform.localPosition;
         
 
