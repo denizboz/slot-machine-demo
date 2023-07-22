@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using CommonTools.Runtime.DependencyInjection;
 using DG.Tweening;
 using Events;
 using Events.Implementations;
-using Managers;
 using UnityEngine;
 using Utility;
 
@@ -11,63 +11,67 @@ namespace Slots
 {
     public class Wheel : MonoBehaviour
     {
+        [SerializeField] private Symbol m_symbolPrefab;
+        [SerializeField] private SpriteContainerSO m_spriteContainer;
         [SerializeField] private Transform m_spinner;
 
-        private SymbolFactory m_symbolFactory;
         private TypeSequenceGenerator m_sequenceGenerator;
         
         private Symbol m_topSymbol;
         private Symbol m_bottomSymbol;
 
         private const int visibleSymbolCount = 3; // must be odd to start with a symbol in the middle
-        private const int extraSymbolCount = 4; // must be even to add half bottom half top
+        private const int extraSymbolCount = 4; // must be even to add half to bottom & half to top
         
         private const int symbolCount = visibleSymbolCount + extraSymbolCount;
+        private const int visibleAndUp = visibleSymbolCount + extraSymbolCount / 2;
+        
         private const float symbolDistance = 3.75f; 
 
-        private readonly List<Symbol> m_symbolList = new List<Symbol>();
+        private readonly List<Symbol> m_symbolPool = new List<Symbol>(symbolCount);
         private SymbolType[] m_sequence;
         private int m_sequenceIndex;
 
         private float m_bottomY;
-
+        private const string bottomPosCheckRoutine = nameof(CheckBottomPosition);
 
         private void Start()
         {
-            m_symbolFactory = DI.Resolve<SymbolFactory>();
             m_sequenceGenerator = DI.Resolve<TypeSequenceGenerator>();
-            
             m_sequenceGenerator.RegisterWheel(this);
             
             FillInitial();
+            StartCoroutine(bottomPosCheckRoutine);
         }
 
-        private void Update()
+        private void UpdateSymbolPositions()
         {
-            if (m_bottomSymbol.WorldPos.y < m_bottomY)
-                TryUpdateSymbols();
-        }
+            m_symbolPool.Remove(m_bottomSymbol);
 
-        private void TryUpdateSymbols()
-        {
-            var symbol = m_bottomSymbol;
-            m_symbolList.Remove(m_bottomSymbol);
-            m_symbolFactory.Return(symbol);
-
-            var visibleAndUp = visibleSymbolCount + extraSymbolCount / 2;
             var blurred = m_sequenceIndex < m_sequence.Length - visibleAndUp;
             var symbolType = m_sequence[m_sequenceIndex];
+            var sprite = m_spriteContainer.GetSprite(symbolType, blurred);
             
-            symbol = m_symbolFactory.Get(symbolType, blurred);
-            symbol.SetParent(m_spinner);
-            symbol.SetPosition(m_topSymbol.LocalPos + symbolDistance * Vector3.up);
-            
-            m_symbolList.Add(symbol);
+            m_bottomSymbol.SetSprite(sprite);
+            m_bottomSymbol.SetPosition(m_topSymbol.LocalPos + symbolDistance * Vector3.up);
 
-            m_bottomSymbol = m_symbolList[0];
-            m_topSymbol = symbol;
+            m_topSymbol = m_bottomSymbol;
+            m_bottomSymbol = m_symbolPool[0];
+            m_symbolPool.Add(m_topSymbol);
 
             m_sequenceIndex++;
+
+            StartCoroutine(bottomPosCheckRoutine);
+        }
+        
+        private IEnumerator CheckBottomPosition()
+        {
+            while (m_bottomSymbol.WorldPos.y > m_bottomY)
+            {
+                yield return null;
+            }
+            
+            UpdateSymbolPositions();
         }
         
         public void Spin(SymbolType targetType, float time, float speed, Ease ease = Ease.Linear)
@@ -89,14 +93,14 @@ namespace Slots
         
         private void ResetSpinner()
         {
-            foreach (var symbol in m_symbolList)
+            foreach (var symbol in m_symbolPool)
             {
                 symbol.SetParent(transform, true);
             }
             
             m_spinner.localPosition = Vector3.zero;
             
-            foreach (var symbol in m_symbolList)
+            foreach (var symbol in m_symbolPool)
             {
                 symbol.SetParent(m_spinner, true);
             }
@@ -113,12 +117,15 @@ namespace Slots
                 var pos = startPos + (i * symbolDistance) * Vector3.up;
 
                 var symbolType = m_sequenceGenerator.GetRandomSingle(this);
-                var symbol = m_symbolFactory.Get(symbolType);
+                var sprite = m_spriteContainer.GetSprite(symbolType);
+
+                var symbol = Instantiate(m_symbolPrefab);
                     
                 symbol.SetParent(m_spinner);
                 symbol.SetPosition(pos);
+                symbol.SetSprite(sprite);
 
-                m_symbolList.Add(symbol);
+                m_symbolPool.Add(symbol);
 
                 if (i == 0)
                     m_bottomSymbol = symbol;

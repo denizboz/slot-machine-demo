@@ -16,7 +16,7 @@ namespace Utility
         private bool m_initialized;
         
 
-        public Sprite GetSprite(SymbolType symbolType, bool blurred)
+        public Sprite GetSprite(SymbolType symbolType, bool blurred = false)
         {
             TryInitialize();
 

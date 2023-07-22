@@ -76,4 +76,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6f6f5a7e1f2422eb6367a060ace96c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_symbolPrefab: {fileID: 6754402100598669794, guid: 74fa457ca0f8f9c47b6994230eb4deb1,
+    type: 3}
+  m_spriteContainer: {fileID: 11400000, guid: fb424f6f84faab24e9b12fbf5d323d9a, type: 2}
   m_spinner: {fileID: 1160660138400639194}
