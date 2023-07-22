@@ -9,7 +9,7 @@ using Utility;
 
 namespace Slots
 {
-    public class SlotMachine : MonoBehaviour
+    public class SlotMachine : Dependency
     {
         [SerializeField] private ParametersSO m_parameters;
         // can also be loaded by Resources.Load(), depending on preference.
@@ -30,11 +30,18 @@ namespace Slots
         
         private float m_wheelSpeed;
 
+
+        public override void Bind()
+        {
+            DI.Bind(this);
+        }
         
         protected void Awake()
         {
-            DI.Bind(this);
             RegisterParameters();
+            
+            m_dataManager = DI.Resolve<DataManager>();
+            m_rewardManager = DI.Resolve<RewardManager>();
             
             GameEventSystem.AddListener<DataLoadedEvent>(OnDataLoaded);
             GameEventSystem.AddListener<DataRefreshedEvent>(OnDataLoaded);
@@ -43,9 +50,6 @@ namespace Slots
 
         private void Start()
         {
-            m_dataManager = DI.Resolve<DataManager>();
-            m_rewardManager = DI.Resolve<RewardManager>();
-            
             GameEventSystem.Invoke<WheelsRegisteredEvent>(m_wheels.Length);
         }
 

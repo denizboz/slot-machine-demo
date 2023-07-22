@@ -10,7 +10,7 @@ using Utility;
 
 namespace Managers
 {
-    public class RewardManager : Manager
+    public class RewardManager : Dependency
     {
         [SerializeField] private ParametersSO m_parameters;
         [SerializeField] private ParticleSystem m_coinParticles;
@@ -25,13 +25,12 @@ namespace Managers
         private float particlePlayTime;
 
 
-        protected override void Bind()
+        public override void Bind()
         {
             DI.Bind(this);
-            
         }
 
-        protected override void OnAwake()
+        private void Awake()
         {
             particlePlayTime = m_parameters.CoinAnimDuration;
             

@@ -35,7 +35,7 @@ namespace Slots
         private float m_bottomY;
         private const string bottomPosCheckRoutine = nameof(CheckBottomPosition);
 
-        private void Start()
+        private void Awake()
         {
             m_sequenceGenerator = DI.Resolve<TypeSequenceGenerator>();
             m_sequenceGenerator.RegisterWheel(this);

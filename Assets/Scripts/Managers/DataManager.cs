@@ -8,7 +8,7 @@ using Utility;
 
 namespace Managers
 {
-    public class DataManager : Manager
+    public class DataManager : Dependency
     {
         [SerializeField] private ProbDistributionSO m_probDistribution;
         
@@ -17,12 +17,18 @@ namespace Managers
         
         private const string keyForCurrentRound = "current_round";
         
-        protected override void Bind()
+        public override void Bind()
         {
             DI.Bind(this);
+            
+            var distributionGenerator = new DistributionGenerator<Lineup>(m_probDistribution.LineupOccurrences);
+            DI.Bind(distributionGenerator);
+            
+            var typeSequenceGenerator = new TypeSequenceGenerator();
+            DI.Bind(typeSequenceGenerator);
         }
 
-        protected override void OnAwake()
+        private void Awake()
         {
             if (!PlayerPrefs.HasKey(keyForCurrentRound))
                 PlayerPrefs.SetInt(keyForCurrentRound, 0);
@@ -30,20 +36,8 @@ namespace Managers
             CurrentRound = PlayerPrefs.GetInt(keyForCurrentRound);
             m_totalRoundCount = m_probDistribution.GetTotalOccurenceCount();
 
-            var distributionGenerator = new DistributionGenerator<Lineup>(m_probDistribution.LineupOccurrences);
-            DI.Bind(distributionGenerator);
-
-            var possibleSymbolTypes = Enum.GetValues(typeof(SymbolType)) as SymbolType[];
-            possibleSymbolTypes = possibleSymbolTypes.OrderBy(type => (int)type).ToArray();
-
-            var typeSequenceGenerator = new TypeSequenceGenerator(possibleSymbolTypes);
-            DI.Bind(typeSequenceGenerator);
-            
             GameEventSystem.AddListener<FullSpinStartedEvent>(ManageRound);
-        }
-        
-        private void Start()
-        {
+            
             if (CurrentRound == 0)
                 RefreshData();
             else

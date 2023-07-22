@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Slots;
 using Random = UnityEngine.Random;
 
@@ -11,10 +13,12 @@ namespace Utility
 
         private readonly Dictionary<Wheel, SymbolType> m_lastRandomTypeDict;
         
-        public TypeSequenceGenerator(SymbolType[] symbolTypes)
+        public TypeSequenceGenerator()
         {
-            m_possibleSymbolTypes = symbolTypes;
-            m_varietySize = symbolTypes.Length;
+            var possibleSymbolTypes = Enum.GetValues(typeof(SymbolType)) as SymbolType[];
+            m_possibleSymbolTypes = possibleSymbolTypes.OrderBy(type => (int)type).ToArray();
+            
+            m_varietySize = m_possibleSymbolTypes.Length;
 
             m_lastRandomTypeDict = new Dictionary<Wheel, SymbolType>();
         }

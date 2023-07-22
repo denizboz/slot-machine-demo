@@ -2,11 +2,12 @@
 
 namespace Managers
 {
-    public class GameManager : Manager
+    public class GameManager : MonoBehaviour
     {
-        protected override void OnAwake()
+        private void Awake()
         {
             Application.targetFrameRate = 60;
+            Input.multiTouchEnabled = false;
         }
     }
 }
