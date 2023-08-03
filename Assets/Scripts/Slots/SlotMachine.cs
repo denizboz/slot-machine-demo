@@ -9,7 +9,7 @@ using Utility;
 
 namespace Slots
 {
-    public class SlotMachine : Dependency
+    public class SlotMachine : MonoBehaviour, IDependencyHandler
     {
         [SerializeField] private ParametersSO m_parameters;
         // can also be loaded by Resources.Load(), depending on preference.
@@ -31,7 +31,7 @@ namespace Slots
         private float m_wheelSpeed;
 
 
-        public override void Bind()
+        public void Bind()
         {
             DI.Bind(this);
         }

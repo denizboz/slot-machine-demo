@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 namespace CommonTools.Runtime.DependencyInjection
 {
@@ -7,7 +8,7 @@ namespace CommonTools.Runtime.DependencyInjection
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void BindDependencies()
         {
-            var dependencies = Object.FindObjectsOfType<Dependency>();
+            var dependencies = Object.FindObjectsOfType<MonoBehaviour>().OfType<IDependencyHandler>();
 
             foreach (var dependency in dependencies)
             {

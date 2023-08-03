@@ -10,7 +10,7 @@ using Utility;
 
 namespace Managers
 {
-    public class RewardManager : Dependency
+    public class RewardManager : MonoBehaviour, IDependencyHandler
     {
         [SerializeField] private ParametersSO m_parameters;
         [SerializeField] private ParticleSystem m_coinParticles;
@@ -25,7 +25,7 @@ namespace Managers
         private float particlePlayTime;
 
 
-        public override void Bind()
+        public void Bind()
         {
             DI.Bind(this);
         }

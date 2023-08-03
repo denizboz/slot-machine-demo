@@ -8,7 +8,7 @@ using Utility;
 
 namespace Managers
 {
-    public class DataManager : Dependency
+    public class DataManager : MonoBehaviour, IDependencyHandler
     {
         [SerializeField] private ProbDistributionSO m_probDistribution;
         
@@ -17,7 +17,7 @@ namespace Managers
         
         private const string keyForCurrentRound = "current_round";
         
-        public override void Bind()
+        public void Bind()
         {
             DI.Bind(this);
             
