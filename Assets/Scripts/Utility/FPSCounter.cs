@@ -1,5 +1,4 @@
-﻿using CommonTools.Runtime.DependencyInjection;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 
 namespace Utility
@@ -7,12 +6,21 @@ namespace Utility
     public class FPSCounter : MonoBehaviour
     {
         [SerializeField] private float m_refreshPeriod = 1f;
+
+        [SerializeField, Tooltip("Uses Update function.")]
+        private bool m_showFPS = true;
         
         private TextMeshProUGUI m_tmp;
         private float m_timer;
         private int m_currentFPS;
 
         private void Awake()
+        {
+            if (!m_showFPS)
+                gameObject.SetActive(false);
+        }
+
+        private void Start()
         {
             m_tmp = GetComponent<TextMeshProUGUI>();
         }
