@@ -45,13 +45,13 @@ namespace CommonTools.Runtime
             if (pool.Count > 0)
                 return;
 
-            poolSize *= 2;
-
-            for (int i = poolSize / 2; i < poolSize; i++)
+            for (int i = 0; i < poolSize; i++)
             {
                 var builder = new StringBuilder();
                 pool.Enqueue(builder);
             }
+
+            poolSize *= 2;
             
             Debug.LogWarning($"StringBuilder pool capacity increased from {(poolSize / 2).ToString()} to {poolSize.ToString()}");
         }
