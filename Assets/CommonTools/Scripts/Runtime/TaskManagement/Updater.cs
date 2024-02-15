@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace CommonTools.Runtime.TaskManagement
 {
@@ -11,7 +10,7 @@ namespace CommonTools.Runtime.TaskManagement
         static Updater()
         {
             var updater = new GameObject("Updater").AddComponent<Updater>();
-            Object.DontDestroyOnLoad(updater);
+            DontDestroyOnLoad(updater);
         }
         
         private void Update()
