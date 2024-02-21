@@ -42,20 +42,23 @@ namespace Slots
             
             m_dataManager = DI.Resolve<DataManager>();
             m_rewardManager = DI.Resolve<RewardManager>();
-            
-            EventManager.AddListener<DataRefreshedEvent>(OnDataLoaded);
-            EventManager.AddListener<SpinButtonClickedEvent>(OnSpinButtonClicked);
         }
 
-        private void Start()
+        private void OnEnable()
         {
-            EventManager.Invoke(WheelsRegisteredEvent.New(m_wheels.Length));
+            EventManager.AddListener<DataRefreshedEvent>(OnDataLoaded);
+            EventManager.AddListener<SpinButtonClickedEvent>(OnSpinButtonClicked);
         }
 
         private void OnDisable()
         {
             EventManager.RemoveListener<DataRefreshedEvent>(OnDataLoaded);
             EventManager.RemoveListener<SpinButtonClickedEvent>(OnSpinButtonClicked);
+        }
+
+        private void Start()
+        {
+            EventManager.Invoke(WheelsRegisteredEvent.New(m_wheels.Length));
         }
         
         private void OnDataLoaded(DataRefreshedEvent eventData)

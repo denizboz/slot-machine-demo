@@ -34,12 +34,15 @@ namespace Managers
             CurrentRound = PlayerPrefs.GetInt(keyForCurrentRound);
             m_totalRoundCount = m_probDistribution.GetTotalOccurenceCount();
 
-            EventManager.AddListener<FullSpinStartedEvent>(ManageRound);
-            
             if (CurrentRound == 0)
                 RefreshData();
             else
                 LoadData();
+        }
+
+        private void OnEnable()
+        {
+            EventManager.AddListener<FullSpinStartedEvent>(ManageRound);
         }
 
         private void OnDisable()

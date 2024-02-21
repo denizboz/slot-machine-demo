@@ -39,7 +39,10 @@ namespace Managers
             main.startLifetime = particlePlayTime;
 
             SetParticleRates(m_parameters.BaseCoinParticleRate);
-            
+        }
+
+        private void OnEnable()
+        {
             EventManager.AddListener<WheelsRegisteredEvent>(OnWheelsRegistered);
             EventManager.AddListener<WheelSpinCompletedEvent>(OnOneSpinComplete);
         }

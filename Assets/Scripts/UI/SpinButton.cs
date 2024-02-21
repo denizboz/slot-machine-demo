@@ -12,7 +12,10 @@ namespace UI
         private void Awake()
         {
             m_button = GetComponent<Button>();
+        }
 
+        private void OnEnable()
+        {
             m_button.onClick.AddListener(OnButtonClicked);
             EventManager.AddListener<RewardingCompletedEvent>(OnRewardingComplete);
         }
