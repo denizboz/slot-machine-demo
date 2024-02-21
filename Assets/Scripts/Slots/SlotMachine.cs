@@ -12,7 +12,7 @@ namespace Slots
     public class SlotMachine : MonoBehaviour, IDependencyHandler
     {
         [SerializeField] private ParametersSO m_parameters;
-        // can also be loaded by Resources.Load(), depending on preference.
+        // can also be loaded with Resources.Load(), depending on preference.
         
         [SerializeField] private Wheel[] m_wheels;
 
@@ -43,22 +43,27 @@ namespace Slots
             m_dataManager = DI.Resolve<DataManager>();
             m_rewardManager = DI.Resolve<RewardManager>();
             
-            GameEventSystem.AddListener<DataLoadedEvent>(OnDataLoaded);
-            GameEventSystem.AddListener<DataRefreshedEvent>(OnDataLoaded);
-            GameEventSystem.AddListener<SpinButtonClickedEvent>(OnSpinButtonClicked);
+            EventManager.AddListener<DataRefreshedEvent>(OnDataLoaded);
+            EventManager.AddListener<SpinButtonClickedEvent>(OnSpinButtonClicked);
         }
 
         private void Start()
         {
-            GameEventSystem.Invoke<WheelsRegisteredEvent>(m_wheels.Length);
+            EventManager.Invoke(WheelsRegisteredEvent.New(m_wheels.Length));
         }
 
-        private void OnDataLoaded(object lineupArray)
+        private void OnDisable()
         {
-            m_lineups = (Lineup[])lineupArray;
+            EventManager.RemoveListener<DataRefreshedEvent>(OnDataLoaded);
+            EventManager.RemoveListener<SpinButtonClickedEvent>(OnSpinButtonClicked);
         }
         
-        private void OnSpinButtonClicked(object obj)
+        private void OnDataLoaded(DataRefreshedEvent eventData)
+        {
+            m_lineups = eventData.Lineups;
+        }
+        
+        private void OnSpinButtonClicked(SpinButtonClickedEvent eventData)
         {
             var wheelCount = m_wheels.Length;
             var symbolTypes = m_lineups[m_dataManager.CurrentRound].GetSymbolTypes();
@@ -91,7 +96,7 @@ namespace Slots
                     m_wheels[di].Spin(symbolTypes[di], durations[di], m_wheelSpeed, easings[di]));
             }
 
-            GameEventSystem.Invoke<FullSpinStartedEvent>();
+            EventManager.Invoke(FullSpinStartedEvent.New());
         }
 
         private void RegisterParameters()
@@ -104,13 +109,6 @@ namespace Slots
             m_spinDelayMax = m_parameters.SpinDelayMax;
             
             m_wheelSpeed = m_parameters.WheelSpeed;
-        }
-
-        private void OnDestroy()
-        {
-            GameEventSystem.RemoveListener<DataLoadedEvent>(OnDataLoaded);
-            GameEventSystem.RemoveListener<DataRefreshedEvent>(OnDataLoaded);
-            GameEventSystem.RemoveListener<SpinButtonClickedEvent>(OnSpinButtonClicked);
         }
     }
 }

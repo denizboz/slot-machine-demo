@@ -40,21 +40,27 @@ namespace Managers
 
             SetParticleRates(m_parameters.BaseCoinParticleRate);
             
-            GameEventSystem.AddListener<WheelsRegisteredEvent>(OnWheelsRegistered);
-            GameEventSystem.AddListener<WheelSpinCompletedEvent>(OnOneSpinComplete);
+            EventManager.AddListener<WheelsRegisteredEvent>(OnWheelsRegistered);
+            EventManager.AddListener<WheelSpinCompletedEvent>(OnOneSpinComplete);
         }
 
-        private void OnWheelsRegistered(object count)
+        private void OnDisable()
         {
-            var wheelCount = (int)count;
+            EventManager.RemoveListener<WheelsRegisteredEvent>(OnWheelsRegistered);
+            EventManager.RemoveListener<WheelSpinCompletedEvent>(OnOneSpinComplete);
+        }
+        
+        private void OnWheelsRegistered(WheelsRegisteredEvent eventData)
+        {
+            var wheelCount = eventData.WheelCount;
             
             m_totalWheelCount = wheelCount;
             m_symbolTypeLineup = new SymbolType[wheelCount];
         }
         
-        private void OnOneSpinComplete(object symbolType)
+        private void OnOneSpinComplete(WheelSpinCompletedEvent eventData)
         {
-            m_symbolTypeLineup[m_completedSpinCount] = (SymbolType)symbolType;
+            m_symbolTypeLineup[m_completedSpinCount] = eventData.SymbolType;
             m_completedSpinCount++;
 
             if (m_completedSpinCount < m_totalWheelCount)
@@ -65,7 +71,7 @@ namespace Managers
             if (IsLineupRewarding(m_symbolTypeLineup))
                 PlayRewardAnimation(m_symbolTypeLineup[0]);
             else
-                GameEventSystem.Invoke<RewardingCompletedEvent>();
+                EventManager.Invoke(RewardingCompletedEvent.New());
         }
 
         public bool IsLineupRewarding(SymbolType[] symbolTypeLineup)
@@ -89,7 +95,7 @@ namespace Managers
             m_coinParticles.Play();
             
             await Task.Delay(TimeSpan.FromSeconds(particlePlayTime));
-            GameEventSystem.Invoke<RewardingCompletedEvent>();
+            EventManager.Invoke(RewardingCompletedEvent.New());
         }
 
         private void SetParticleRates(int baseRate)
@@ -103,12 +109,6 @@ namespace Managers
             {
                 m_coinParticleRates.Add(allSymbolTypes[i], (i + 1) * baseRate);
             }
-        }
-
-        private void OnDestroy()
-        {
-            GameEventSystem.RemoveListener<WheelsRegisteredEvent>(OnWheelsRegistered);
-            GameEventSystem.RemoveListener<WheelSpinCompletedEvent>(OnOneSpinComplete);
         }
     }
 }

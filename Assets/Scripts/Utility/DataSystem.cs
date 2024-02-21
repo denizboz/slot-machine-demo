@@ -34,7 +34,7 @@ namespace Utility
             var path = Path.Combine(Application.persistentDataPath, directory);
 
             if (!File.Exists(path))
-                throw new Exception("Ensure the data saved first.");
+                throw new Exception("Ensure data is saved first.");
             
             var stream = new FileStream(path, FileMode.Open);
 

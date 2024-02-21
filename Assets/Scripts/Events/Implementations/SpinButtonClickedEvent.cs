@@ -1,7 +1,10 @@
 ﻿namespace Events.Implementations
 {
-    public class SpinButtonClickedEvent : Event
+    public class SpinButtonClickedEvent : IEvent
     {
-        
+        public static SpinButtonClickedEvent New()
+        {
+            return new SpinButtonClickedEvent();
+        }
     }
 }

@@ -88,7 +88,7 @@ namespace Slots
             ResetSpinner();
             
             m_spinner.DOLocalMove(distance * Vector3.down, time).SetEase(Ease.OutQuad)
-                .OnComplete(() => GameEventSystem.Invoke<WheelSpinCompletedEvent>(targetType));
+                .OnComplete(() => EventManager.Invoke(WheelSpinCompletedEvent.New(targetType)));
         }
         
         private void ResetSpinner()

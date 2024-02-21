@@ -14,24 +14,24 @@ namespace UI
             m_button = GetComponent<Button>();
 
             m_button.onClick.AddListener(OnButtonClicked);
-            GameEventSystem.AddListener<RewardingCompletedEvent>(OnRewardingComplete);
+            EventManager.AddListener<RewardingCompletedEvent>(OnRewardingComplete);
         }
 
+        private void OnDisable()
+        {
+            m_button.onClick.RemoveListener(OnButtonClicked);
+            EventManager.RemoveListener<RewardingCompletedEvent>(OnRewardingComplete);
+        }
+        
         private void OnButtonClicked()
         {
             m_button.interactable = false;
-            GameEventSystem.Invoke<SpinButtonClickedEvent>();
+            EventManager.Invoke(SpinButtonClickedEvent.New());
         }
         
-        private void OnRewardingComplete(object obj)
+        private void OnRewardingComplete(RewardingCompletedEvent _)
         {
             m_button.interactable = true;
-        }
-
-        private void OnDestroy()
-        {
-            m_button.onClick.RemoveListener(OnButtonClicked);
-            GameEventSystem.RemoveListener<RewardingCompletedEvent>(OnRewardingComplete);
         }
     }
 }

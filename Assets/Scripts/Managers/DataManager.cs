@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using CommonTools.Runtime.DependencyInjection;
+﻿using CommonTools.Runtime.DependencyInjection;
 using Events;
 using Events.Implementations;
 using UnityEngine;
@@ -36,7 +34,7 @@ namespace Managers
             CurrentRound = PlayerPrefs.GetInt(keyForCurrentRound);
             m_totalRoundCount = m_probDistribution.GetTotalOccurenceCount();
 
-            GameEventSystem.AddListener<FullSpinStartedEvent>(ManageRound);
+            EventManager.AddListener<FullSpinStartedEvent>(ManageRound);
             
             if (CurrentRound == 0)
                 RefreshData();
@@ -44,7 +42,12 @@ namespace Managers
                 LoadData();
         }
 
-        private void ManageRound(object obj)
+        private void OnDisable()
+        {
+            EventManager.RemoveListener<FullSpinStartedEvent>(ManageRound);
+        }
+        
+        private void ManageRound(FullSpinStartedEvent _)
         {
             CurrentRound++;
             CurrentRound %= m_totalRoundCount;
@@ -60,7 +63,7 @@ namespace Managers
             var lineups = CreateNewDistribution();
             DataSystem.SaveBinary(lineups);
             
-            GameEventSystem.Invoke<DataRefreshedEvent>(lineups);
+            EventManager.Invoke(DataRefreshedEvent.New(lineups));
 
             Debug.Log($"New lineup distribution created & saved.");
         }
@@ -68,7 +71,7 @@ namespace Managers
         private void LoadData()
         {
             var lineups = DataSystem.LoadBinary<Lineup>();
-            GameEventSystem.Invoke<DataLoadedEvent>(lineups);
+            EventManager.Invoke(DataRefreshedEvent.New(lineups));
             
             Debug.Log($"Lineup distribution loaded from saved data.");
         }
@@ -79,11 +82,6 @@ namespace Managers
             generator.Reset();
             
             return generator.GetDistribution();
-        }
-
-        private void OnDestroy()
-        {
-            GameEventSystem.RemoveListener<FullSpinStartedEvent>(ManageRound);
         }
     }
 }
