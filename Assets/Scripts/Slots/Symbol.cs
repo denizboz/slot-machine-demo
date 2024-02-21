@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Core.Runtime.DependencyInjection;
+using UnityEngine;
 using Utility;
 
 namespace Slots

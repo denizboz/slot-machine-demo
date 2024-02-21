@@ -2,7 +2,7 @@
 using System.Text;
 using UnityEngine;
 
-namespace CommonTools.Runtime
+namespace Core.Runtime
 {
     public static class StringBuilderPool
     {

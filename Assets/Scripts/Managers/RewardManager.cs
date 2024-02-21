@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CommonTools.Runtime.DependencyInjection;
+using Core.Runtime.DependencyInjection;
 using Events;
 using Events.Implementations;
 using UnityEngine;
@@ -10,7 +10,7 @@ using Utility;
 
 namespace Managers
 {
-    public class RewardManager : MonoBehaviour, IDependencyHandler
+    public class RewardManager : MonoBehaviour, IDependency
     {
         [SerializeField] private ParametersSO m_parameters;
         [SerializeField] private ParticleSystem m_coinParticles;
@@ -24,12 +24,7 @@ namespace Managers
 
         private float particlePlayTime;
 
-
-        public void Bind()
-        {
-            DI.Bind(this);
-        }
-
+        
         private void Awake()
         {
             particlePlayTime = m_parameters.CoinAnimDuration;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Runtime.DependencyInjection;
 
 namespace Utility
 {
@@ -22,19 +23,12 @@ namespace Utility
             m_random = new Random();
             m_availableIndices = new List<int>(m_totalOccurrenceCount);
             
-            Reset();
-        }
-
-        public void Reset()
-        {
-            m_availableIndices.Clear();
-
             for (int i = 0; i < m_totalOccurrenceCount; i++)
             {
                 m_availableIndices.Add(i);
             }
         }
-        
+
         public T[] GetDistribution()
         {
             var distribution = new T[m_totalOccurrenceCount];

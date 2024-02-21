@@ -1,5 +1,5 @@
-﻿using CommonTools.Runtime.DependencyInjection;
-using CommonTools.Runtime.TaskManagement;
+﻿using Core.Runtime.DependencyInjection;
+using Core.Runtime.TaskManagement;
 using DG.Tweening;
 using Events;
 using Events.Implementations;
@@ -9,7 +9,7 @@ using Utility;
 
 namespace Slots
 {
-    public class SlotMachine : MonoBehaviour, IDependencyHandler
+    public class SlotMachine : MonoBehaviour, IDependency
     {
         [SerializeField] private ParametersSO m_parameters;
         // can also be loaded with Resources.Load(), depending on preference.
@@ -30,18 +30,14 @@ namespace Slots
         
         private float m_wheelSpeed;
 
-
-        public void Bind()
-        {
-            DI.Bind(this);
-        }
         
-        protected void Awake()
+        [Construct]
+        protected void Construct(DataManager dataManager, RewardManager rewardManager)
         {
             RegisterParameters();
             
-            m_dataManager = DI.Resolve<DataManager>();
-            m_rewardManager = DI.Resolve<RewardManager>();
+            m_dataManager = dataManager;
+            m_rewardManager = rewardManager;
         }
 
         private void OnEnable()

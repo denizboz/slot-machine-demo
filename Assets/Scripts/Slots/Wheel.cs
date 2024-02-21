@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using CommonTools.Runtime.DependencyInjection;
+using Core.Runtime.DependencyInjection;
 using DG.Tweening;
 using Events;
 using Events.Implementations;
@@ -35,9 +35,10 @@ namespace Slots
         private float m_bottomY;
         private const string bottomPosCheckRoutine = nameof(CheckBottomPosition);
 
-        private void Awake()
+        [Construct]
+        private void Construct(TypeSequenceGenerator generator)
         {
-            m_sequenceGenerator = DI.Resolve<TypeSequenceGenerator>();
+            m_sequenceGenerator = generator;
             m_sequenceGenerator.RegisterWheel(this);
             
             FillInitial();

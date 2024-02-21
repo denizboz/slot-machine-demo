@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace CommonTools.Runtime
+namespace Core.Runtime
 {
     public static class Extensions
     {

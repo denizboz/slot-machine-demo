@@ -1,7 +1,7 @@
-﻿using CommonTools.Runtime.TaskManagement;
+﻿using Core.Runtime.TaskManagement;
 using UnityEngine;
 
-namespace CommonTools.Runtime
+namespace Core.Runtime
 {
     public static class InputUtility
     {

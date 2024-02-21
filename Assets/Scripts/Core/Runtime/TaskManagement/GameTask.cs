@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace CommonTools.Runtime.TaskManagement
+namespace Core.Runtime.TaskManagement
 {
     // Simple Task Management for Delayed Actions
     public class GameTask

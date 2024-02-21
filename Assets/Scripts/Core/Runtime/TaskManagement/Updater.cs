@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace CommonTools.Runtime.TaskManagement
+namespace Core.Runtime.TaskManagement
 {
     public class Updater : MonoBehaviour
     {
